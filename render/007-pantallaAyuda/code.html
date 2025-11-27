@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ayuda y Soporte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b6cee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-b-[#232f48] px-4 md:px-10 py-3 bg-white dark:bg-background-dark rounded-t-xl">
+<div class="flex items-center gap-4 text-gray-800 dark:text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined !text-3xl">forum</span>
+</div>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Ayuda y Soporte</h2>
+</div>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-gray-100 dark:bg-[#232f48] text-gray-700 dark:text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-300">arrow_back</span>
+<span class="hidden sm:inline">Volver al Chat</span>
+</button>
+</header>
+<main class="bg-white dark:bg-background-dark p-4 sm:p-6 md:p-8 flex flex-col gap-8 rounded-b-xl">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between gap-3">
+<div class="flex min-w-72 flex-col gap-2">
+<p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">¿Cómo podemos ayudarte?</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-base font-normal leading-normal">Encuentra respuestas a tus preguntas o contacta con nosotros directamente.</p>
+</div>
+</div>
+<!-- SearchBar -->
+<div class="py-3">
+<label class="flex flex-col min-w-40 h-14 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-gray-400 dark:text-[#92a4c9] flex border border-r-0 border-gray-200 dark:border-[#232f48] bg-gray-50 dark:bg-[#232f48] items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-gray-800 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-gray-200 dark:border-[#232f48] bg-gray-50 dark:bg-[#232f48] h-full placeholder:text-gray-400 dark:placeholder:text-[#92a4c9] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Busca en nuestra base de conocimientos..." value=""/>
+</div>
+</label>
+</div>
+<!-- SectionHeader: Acciones Rápidas -->
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-gray-200 dark:border-gray-700">Acciones Rápidas</h2>
+<!-- List Items Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+<!-- Preguntas Frecuentes -->
+<div class="flex flex-col gap-4 bg-gray-50 dark:bg-[#111722] p-6 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal">Preguntas Frecuentes</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Encuentra respuestas a las preguntas más comunes.</p>
+</div>
+</div>
+<!-- Contactar Soporte -->
+<div class="flex flex-col gap-4 bg-gray-50 dark:bg-[#111722] p-6 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal">Contactar con Soporte</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Habla con nuestro equipo para resolver tus dudas.</p>
+</div>
+</div>
+<!-- Términos y Condiciones -->
+<div class="flex flex-col gap-4 bg-gray-50 dark:bg-[#111722] p-6 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal">Términos y Privacidad</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Lee nuestros términos, condiciones y política de privacidad.</p>
+</div>
+</div>
+</div>
+<!-- SectionHeader: FAQ Categories -->
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-gray-200 dark:border-gray-700">Categorías Populares</h2>
+<!-- ListItems for FAQ -->
+<div class="flex flex-col divide-y divide-gray-200 dark:divide-gray-800 px-4">
+<div class="flex items-center gap-4 py-4 cursor-pointer group">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">manage_accounts</span>
+</div>
+<div class="flex flex-col justify-center flex-grow">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Gestión de Cuenta</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal line-clamp-2">Aprende a configurar tu perfil, notificaciones y más.</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center gap-4 py-4 cursor-pointer group">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex flex-col justify-center flex-grow">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Seguridad y Privacidad</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal line-clamp-2">Mantén tu cuenta segura y gestiona tu privacidad.</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center gap-4 py-4 cursor-pointer group">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">build</span>
+</div>
+<div class="flex flex-col justify-center flex-grow">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Resolución de Problemas</p>
+<p class="text-gray-500 dark:text-[#92a4c9] text-sm font-normal leading-normal line-clamp-2">Soluciones a problemas técnicos comunes.</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</div>
+</body></html>
