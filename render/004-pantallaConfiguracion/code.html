@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configuración de Notificaciones</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b6cee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<div class="flex h-full grow flex-row">
+<!-- SideNavBar -->
+<aside class="flex h-auto min-h-screen w-64 flex-col border-r border-gray-200/10 bg-[#111722] p-4">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Avatar de Juan Pérez" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDDMyYmmqbFaXV2XdK2uS3WxnNm8GZQHlm7TSP_RLksDv8w-3T6-oMLrBa20eLeP0vx33GapHLvb7WOSFNXS-Qs9ZKEOoX-S1hPLZZaWv76nX3mZu_WMfFwcg-pSyqPus-QAa58A7hZbAaETjzzGssQ1pCQuI_0mgJOAe43O90Z5MVUqNt7AdYOTm6yi-zb9Ex8SOKUB2DxmdiIwHqeyL8dTBaFGDy7OEQ5BmM_-yor2gBCoHnnJJ8UtRA5kVFKjICSvsYJTU348T3i");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Juan Pérez</h1>
+<p class="text-[#92a4c9] text-sm font-normal leading-normal">En línea</p>
+</div>
+</div>
+<nav class="mt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-sm font-medium leading-normal">Inicio</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<p class="text-sm font-medium leading-normal">Chats</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">tag</span>
+<p class="text-sm font-medium leading-normal">Canales</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<p class="text-sm font-medium leading-normal">Configuración</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<p class="text-sm font-medium leading-normal">Ayuda</p>
+</a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Cerrar sesión</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-6 md:p-10">
+<div class="mx-auto max-w-4xl">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between gap-3 mb-8">
+<h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Configuración de Notificaciones</h1>
+</div>
+<!-- Notification Settings Form -->
+<div class="flex flex-col gap-8">
+<!-- Section: General Notifications -->
+<section>
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-slate-200 dark:border-slate-800">Notificaciones Generales</h2>
+<div class="flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+<div class="flex items-center justify-between gap-4 px-4 py-4 min-h-[72px]">
+<div class="flex items-center gap-4">
+<div class="text-slate-600 dark:text-white flex items-center justify-center rounded-lg bg-slate-200 dark:bg-[#232f48] shrink-0 size-12">
+<span class="material-symbols-outlined">notifications_off</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Modo No Molestar</p>
+<p class="text-slate-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Pausa todas las notificaciones temporalmente</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#232f48] p-0.5 has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-200 ease-in-out transform translate-x-0 has-[:checked]:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between gap-4 px-4 py-4 min-h-[72px]">
+<div class="flex items-center gap-4">
+<div class="text-slate-600 dark:text-white flex items-center justify-center rounded-lg bg-slate-200 dark:bg-[#232f48] shrink-0 size-12">
+<span class="material-symbols-outlined">desktop_windows</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Notificaciones de escritorio</p>
+<p class="text-slate-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Recibir alertas fuera de la aplicación</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#232f48] p-0.5 has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-200 ease-in-out transform translate-x-0 has-[:checked]:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Sounds -->
+<section>
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-slate-200 dark:border-slate-800">Sonidos y Vibración</h2>
+<div class="flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+<div class="flex items-center justify-between gap-4 px-4 py-4 min-h-[72px]">
+<div class="flex items-center gap-4">
+<div class="text-slate-600 dark:text-white flex items-center justify-center rounded-lg bg-slate-200 dark:bg-[#232f48] shrink-0 size-12">
+<span class="material-symbols-outlined">volume_up</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Sonido de notificaciones</p>
+<p class="text-slate-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Activa los sonidos para todas las alertas</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#232f48] p-0.5 has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-200 ease-in-out transform translate-x-0 has-[:checked]:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-4 min-h-[72px]">
+<p class="text-slate-900 dark:text-white text-base font-normal leading-normal flex-1">Tono para mensajes nuevos</p>
+<div class="shrink-0 w-full sm:w-auto">
+<select class="w-full sm:w-56 rounded-lg border-slate-300 dark:border-slate-700 bg-background-light dark:bg-[#232f48] text-slate-900 dark:text-white focus:border-primary focus:ring-primary">
+<option>Predeterminado</option>
+<option>Tono 1</option>
+<option>Tono 2</option>
+<option>Silencio</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: By Message Type -->
+<section>
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-slate-200 dark:border-slate-800">Configuración por Tipo de Mensaje</h2>
+<div class="flex flex-col gap-4 p-4">
+<p class="text-slate-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Elige cuándo quieres recibir notificaciones.</p>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="form-radio text-primary bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600 focus:ring-primary" name="notification-type" type="radio"/>
+<span class="text-slate-900 dark:text-white">Todos los mensajes</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input class="form-radio text-primary bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600 focus:ring-primary" name="notification-type" type="radio"/>
+<span class="text-slate-900 dark:text-white">Solo menciones directas y palabras clave</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input class="form-radio text-primary bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600 focus:ring-primary" name="notification-type" type="radio"/>
+<span class="text-slate-900 dark:text-white">Nunca</span>
+</label>
+</div>
+</div>
+</section>
+<!-- Section: Channel Specific -->
+<section>
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-slate-200 dark:border-slate-800">Configuración Específica</h2>
+<div class="flex items-center justify-between gap-4 px-4 py-4 min-h-[72px]">
+<div class="flex items-center gap-4">
+<div class="text-slate-600 dark:text-white flex items-center justify-center rounded-lg bg-slate-200 dark:bg-[#232f48] shrink-0 size-12">
+<span class="material-symbols-outlined">tune</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Anular para canales específicos</p>
+<p class="text-slate-500 dark:text-[#92a4c9] text-sm font-normal leading-normal">Personaliza las alertas para conversaciones individuales</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="bg-slate-200 dark:bg-[#232f48] text-slate-900 dark:text-white font-medium py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-[#2d3a54] transition-colors">
+                                         Gestionar
+                                     </button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>
