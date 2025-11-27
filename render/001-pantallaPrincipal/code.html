@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chat Application</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b6cee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "sidebar-light": "#eef0f2",
+              "sidebar-dark": "#181f2b",
+              "surface-light": "#ffffff",
+              "surface-dark": "#111722",
+              "text-primary-light": "#18181b",
+              "text-primary-dark": "#ffffff",
+              "text-secondary-light": "#71717a",
+              "text-secondary-dark": "#92a4c9",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-primary-light dark:text-text-primary-dark">
+<div class="flex h-screen w-full">
+<aside class="flex h-full w-[360px] flex-shrink-0 flex-col border-r border-gray-200 dark:border-gray-800 bg-sidebar-light dark:bg-sidebar-dark">
+<div class="flex h-full flex-col p-4">
+<div class="mb-4">
+<h1 class="text-2xl font-bold px-2 py-2">Chats</h1>
+</div>
+<div class="px-2 mb-4">
+<label class="flex flex-col h-11 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-text-secondary-light dark:text-text-secondary-dark flex border-none bg-surface-light dark:bg-surface-dark items-center justify-center pl-3 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark focus:border-none h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark pl-2 text-sm font-normal leading-normal" placeholder="Search contacts..." value=""/>
+</div>
+</label>
+</div>
+<div class="px-2 mb-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-wide gap-2 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-base">add</span>
+<span class="truncate">New Chat</span>
+</button>
+</div>
+<div class="flex-grow overflow-y-auto pr-1">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 bg-primary/20 dark:bg-primary/30 px-4 min-h-[72px] py-2 justify-between rounded-lg cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" data-alt="Avatar for Elena Rodriguez" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8lxCt-RLBHUHS-6Mp9_gm7sov0us27_XTrs4dKKwGH0wiVd8QSahl3mG0_w8IkL--L-AqYoLEll2LALK1C3jzM8knl_v_bJ_kXa-UEXK9cnMbfVLziNj33YE0_oLJFJYoh-dTc6iZc5A8fAMtPBQuWMtEkg2ovhgt529IOiFDI-AaJGZEblh0Bc2aAv9xHM2xUzAcHea_C8gUk7PivFVl9KyPgFGBz2iCDiXa-Kkp72OSUpGrO73jRvXC_OZoJIU--jXN6pgAesgk');"></div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal line-clamp-1">Elena Rodriguez</p>
+<p class="text-primary text-sm font-medium leading-normal line-clamp-2">Perfect! See you then.</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-normal leading-normal">10:42 AM</p></div>
+</div>
+<div class="flex items-center gap-3 hover:bg-gray-200 dark:hover:bg-white/10 px-4 min-h-[72px] py-2 justify-between rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" data-alt="Avatar for Marcus Chen" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB90P6TCrUZyofI6JSchBBfpaElY4Ahtdft9coGRVOCnS5lUND8isJtnzeCHrV3URw7q7BjDGjwknlzbbdH4Wa1H5yEMJmEV9od4daa23TpJmK6r4Qw_WQHWAxJP_RAlkn3j753uvgdfFWBcqozdz2ZKOa6JaAQsO4Qjk96NX0LEZvAxmQXygGN0qIuaTrQ4OjWcWhy506Mnh-T7J1MfGudj57ewsPgFiMSN6mTyQgbEGYu3CjR6P6zFDNdEtXHf6MPj218eML251qx');"></div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal line-clamp-1">Marcus Chen</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal line-clamp-2">Can you send over the file?</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="flex size-7 items-center justify-center"><div class="size-2 rounded-full bg-primary"></div></div>
+</div>
+</div>
+<div class="flex items-center gap-3 hover:bg-gray-200 dark:hover:bg-white/10 px-4 min-h-[72px] py-2 justify-between rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" data-alt="Avatar for Aisha Khan" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDFLltKVOGYbvp7-g7Q8yyzAx7YJlm6p0rFgWq1R8FLUKFJEObwjJVnXmhpsRI97-OlgDxpSSblNAEWAqoTAXRvM9OmCpeG6Aa0Cisau4d4HyTn3iaBwuFNzF-GUmkVuEI9x4J8tPMSzh8ec8I9r4FqwN4verMM3AeIuYbmvBZ8WMumv_R220y8HvuDh8mA-dBbdb9teakcU0-qO0JYO9a7JUc5-x4oFObQjCN3F7INEzArGzlSXo5bCERBNsygxuwHQ5T1SnLSM9VF');"></div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal line-clamp-1">Aisha Khan</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal line-clamp-2">Sounds good, I'll review it today.</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-normal leading-normal">Yesterday</p></div>
+</div>
+<div class="flex items-center gap-3 hover:bg-gray-200 dark:hover:bg-white/10 px-4 min-h-[72px] py-2 justify-between rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" data-alt="Avatar for John Doe" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCRL75jfZQM4eOBM_ZllavNJYEQHcUeW5W-6oZ2HCAJcsm4GBd-doJhxFINjkmjmuq9Uwe6tTkPn-p5hRbHeGb-hDUwdjCf73sJP_axsMikpdjLJEp2brhe1MKWtVtcmrYa0dYAa0D2CcgIbZegDKZRwdrTYjzbYFp3bHKFwnmJxk6mF28UyiLDcd59vTNv1mS9PijOnfJgBQH63Di4TSgPR07GqzhQLrkY-XK5QlzYZdWPa1EVDi9689G8PRBl8TeOPbS3Ic092_Z_');"></div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal line-clamp-1">John Doe</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal line-clamp-2">Hey, are you free for a call?</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-normal leading-normal">2 days ago</p></div>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-700 mt-auto pt-4 flex items-center justify-between px-2">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCRL75jfZQM4eOBM_ZllavNJYEQHcUeW5W-6oZ2HCAJcsm4GBd-doJhxFINjkmjmuq9Uwe6tTkPn-p5hRbHeGb-hDUwdjCf73sJP_axsMikpdjLJEp2brhe1MKWtVtcmrYa0dYAa0D2CcgIbZegDKZRwdrTYjzbYFp3bHKFwnmJxk6mF28UyiLDcd59vTNv1mS9PijOnfJgBQH63Di4TSgPR07GqzhQLrkY-XK5QlzYZdWPa1EVDi9689G8PRBl8TeOPbS3Ic092_Z_');"></div>
+<div>
+<p class="font-medium text-sm text-text-primary-light dark:text-text-primary-dark">John Doe</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Online</p>
+</div>
+</div>
+<button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 bg-background-light dark:bg-background-dark">
+<div class="flex h-full flex-col items-center justify-center p-8">
+<div class="text-center">
+<div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined !text-4xl">chat_bubble</span>
+</div>
+<h2 class="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Welcome to Messenger</h2>
+<p class="mt-2 text-base text-text-secondary-light dark:text-text-secondary-dark">Select a chat to start messaging.</p>
+</div>
+</div>
+</main>
+</div>
+</body></html>
