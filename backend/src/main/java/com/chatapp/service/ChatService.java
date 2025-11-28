@@ -19,7 +19,7 @@ public class ChatService {
 
     public Chat createPrivateChat(String otherUserId) {
         User currentUser = userService.getCurrentUser();
-        User otherUser = userService.getUserById(otherUserId);
+        // User otherUser = userService.getUserById(otherUserId);
 
         // Verificar si ya existe un chat privado entre estos usuarios
         Optional<Chat> existingChat = chatRepository.findPrivateChatBetweenUsers(
