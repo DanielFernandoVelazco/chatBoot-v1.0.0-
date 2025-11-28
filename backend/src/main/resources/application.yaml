@@ -9,7 +9,12 @@ spring:
       uri: mongodb://localhost:27017/chat-app
       auto-index-creation: true
 
+jwt:
+  secret: "mySecretKeyForJWTGenerationInChatApp2024SecurityMakeThisLongAndSecure"
+  expiration: 86400000 # 24 horas en milisegundos
+
 logging:
   level:
     com.chatapp: DEBUG
     org.springframework.data.mongodb.core: INFO
+    org.springframework.security: DEBUG
