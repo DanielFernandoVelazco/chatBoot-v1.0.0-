@@ -8,13 +8,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final WebSocketNotificationService webSocketNotificationService;
 
     public User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -51,16 +52,9 @@ public class UserService {
         return userRepository.save(currentUser);
     }
 
-    public User updateStatus(String status) {
-        User user = getCurrentUser();
-        user.setStatus(status);
-        user.setLastSeen(LocalDateTime.now());
-        return userRepository.save(user);
-    }
-
     public void addContact(String contactUserId) {
         User currentUser = getCurrentUser();
-        User contactUser = getUserById(contactUserId);
+        // User contactUser = getUserById(contactUserId);
 
         if (!currentUser.getContacts().contains(contactUserId)) {
             currentUser.getContacts().add(contactUserId);
@@ -91,5 +85,16 @@ public class UserService {
         user.setNotificationSettings(notificationSettings);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public User updateStatus(String status) {
+        User user = getCurrentUser();
+        user.setStatus(status);
+        user.setLastSeen(LocalDateTime.now());
+        User savedUser = userRepository.save(user);
+
+        // Notificar cambio de estado via WebSocket
+        webSocketNotificationService.notifyUserStatusChange(savedUser.getId(), status);
+        return savedUser;
     }
 }
