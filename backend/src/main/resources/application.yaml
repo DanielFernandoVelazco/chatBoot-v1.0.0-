@@ -12,3 +12,4 @@ spring:
 logging:
   level:
     com.chatapp: DEBUG
+    org.springframework.data.mongodb.core: INFO
