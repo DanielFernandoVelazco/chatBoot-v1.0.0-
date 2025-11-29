@@ -1,15 +1,14 @@
 HELP.md
+
+### Maven / Java ###
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+### Spring Tool Suite (STS) ###
 .apt_generated
-.classpath
 .factorypath
-.project
-.settings
 .springBeans
 .sts4-cache
 
@@ -25,9 +24,46 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
+
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+### Node ###
+/node_modules
+npm-debug.log
+yarn-error.log
+
+### Angular / Frontend ###
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+### Compiled output ###
+/tmp
+/out-tsc
+/bazel-out
+
+### IDEs and editors ###
+.c9/
+*.launch
+*.sublime-workspace
+
+### System files ###
+.DS_Store
+Thumbs.db
+
