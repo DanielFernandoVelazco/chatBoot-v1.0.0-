@@ -1,1 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
+/* Estilos globales mínimos */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f6f6f8;
+    color: #18181b;
+}
+
+body.dark {
+    background-color: #101622;
+    color: #ffffff;
+}
+
+/* Reset básico */
+* {
+    box-sizing: border-box;
+}
