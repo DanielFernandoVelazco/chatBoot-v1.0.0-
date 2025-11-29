@@ -45,7 +45,8 @@ npm-debug.log
 yarn-error.log
 
 ### Angular / Frontend ###
-/.angular/cache
+/.angular
+.angular/
 .sass-cache/
 /connect.lock
 /coverage
