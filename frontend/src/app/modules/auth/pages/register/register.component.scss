@@ -1,5 +1,213 @@
 .register-container {
-    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+}
+
+.register-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.logo-section {
     text-align: center;
-    font-family: 'Inter', sans-serif;
+    margin-bottom: 2rem;
+}
+
+.logo-icon {
+    font-size: 3rem !important;
+    color: #2b6cee;
+    margin-bottom: 0.5rem;
+}
+
+.app-title {
+    color: #2b6cee;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-title {
+    color: #1a202c;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.form-subtitle {
+    color: #718096;
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 0.875rem;
+}
+
+.form-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    font-family: inherit;
+
+    &:focus {
+        outline: none;
+        border-color: #2b6cee;
+        box-shadow: 0 0 0 3px rgba(43, 108, 238, 0.1);
+    }
+
+    &:disabled {
+        background-color: #f7fafc;
+        cursor: not-allowed;
+    }
+
+    &.textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+}
+
+.password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #718096;
+    padding: 0.25rem;
+    border-radius: 4px;
+
+    &:hover {
+        background-color: #f7fafc;
+    }
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.submit-button {
+    background-color: #2b6cee;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 48px;
+
+    &:hover:not(:disabled) {
+        background-color: #1e5fd0;
+    }
+
+    &:disabled {
+        background-color: #a0aec0;
+        cursor: not-allowed;
+    }
+}
+
+.terms-text {
+    text-align: center;
+    color: #718096;
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.terms-link {
+    color: #2b6cee;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.login-link {
+    text-align: center;
+    color: #718096;
+    margin: 1rem 0 0 0;
+
+    a {
+        color: #2b6cee;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    .register-card {
+        background: #2d3748;
+        color: white;
+    }
+
+    .form-title {
+        color: white;
+    }
+
+    .form-subtitle {
+        color: #cbd5e0;
+    }
+
+    .form-group label {
+        color: #e2e8f0;
+    }
+
+    .form-input {
+        background-color: #4a5568;
+        border-color: #4a5568;
+        color: white;
+
+        &:focus {
+            border-color: #2b6cee;
+        }
+
+        &::placeholder {
+            color: #a0aec0;
+        }
+    }
+
+    .password-toggle:hover {
+        background-color: #4a5568;
+    }
 }
