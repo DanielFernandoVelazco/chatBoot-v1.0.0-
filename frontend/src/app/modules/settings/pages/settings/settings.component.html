@@ -1,0 +1,275 @@
+<div class="settings-container">
+    <!-- Header -->
+    <header class="settings-header">
+        <div class="header-content">
+            <button class="back-button" (click)="navigateToChat()">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span>Volver al Chat</span>
+            </button>
+            <h1 class="settings-title">Configuración</h1>
+        </div>
+    </header>
+
+    <div class="settings-content">
+        <!-- Sidebar Navigation -->
+        <aside class="settings-sidebar">
+            <nav class="settings-nav">
+                <button class="nav-item" [class.active]="activeSection === 'profile'"
+                    (click)="selectSection('profile')">
+                    <span class="material-symbols-outlined">person</span>
+                    <span>Perfil</span>
+                </button>
+
+                <button class="nav-item" [class.active]="activeSection === 'notifications'"
+                    (click)="selectSection('notifications')">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span>Notificaciones</span>
+                </button>
+
+                <button class="nav-item" [class.active]="activeSection === 'privacy'"
+                    (click)="selectSection('privacy')">
+                    <span class="material-symbols-outlined">lock</span>
+                    <span>Privacidad y Seguridad</span>
+                </button>
+
+                <button class="nav-item" [class.active]="activeSection === 'account'"
+                    (click)="selectSection('account')">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Cuenta</span>
+                </button>
+
+                <button class="nav-item" [class.active]="activeSection === 'help'" (click)="selectSection('help')">
+                    <span class="material-symbols-outlined">help</span>
+                    <span>Ayuda y Soporte</span>
+                </button>
+
+                <button class="nav-item logout-item" (click)="logout()">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="settings-main">
+            <!-- Profile Section -->
+            <section *ngIf="activeSection === 'profile'" class="settings-section">
+                <h2 class="section-title">Editar Perfil</h2>
+
+                <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()" class="settings-form">
+                    <!-- Profile Picture -->
+                    <div class="profile-picture-section">
+                        <div class="profile-avatar">
+                            <img [src]="currentUser?.profilePicture || 'https://via.placeholder.com/150'"
+                                [alt]="currentUser?.fullName">
+                        </div>
+                        <button type="button" class="change-photo-button" (click)="changeProfilePicture()">
+                            Cambiar Foto
+                        </button>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" formControlName="fullName" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre de Usuario</label>
+                            <input type="text" formControlName="username" class="form-input" readonly>
+                            <small class="form-help">El nombre de usuario no se puede cambiar</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" formControlName="email" class="form-input">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Biografía</label>
+                            <textarea formControlName="bio" class="form-input textarea" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Guardar Cambios</button>
+                        <button type="button" class="cancel-button" (click)="populateForms()">Cancelar</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Notifications Section -->
+            <section *ngIf="activeSection === 'notifications'" class="settings-section">
+                <h2 class="section-title">Configuración de Notificaciones</h2>
+
+                <form [formGroup]="notificationForm" (ngSubmit)="onNotificationSubmit()" class="settings-form">
+                    <!-- Notification Toggles -->
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Notificaciones de escritorio</h3>
+                            <p>Recibir alertas fuera de la aplicación</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="desktopNotifications">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Sonido de notificaciones</h3>
+                            <p>Activa los sonidos para todas las alertas</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="soundEnabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Modo No Molestar</h3>
+                            <p>Pausa todas las notificaciones temporalmente</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="doNotDisturb">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Notification Type -->
+                    <div class="form-group">
+                        <label>Tipo de notificación de mensajes</label>
+                        <select formControlName="messageNotificationType" class="form-input">
+                            <option value="ALL">Todos los mensajes</option>
+                            <option value="MENTIONS">Solo menciones directas</option>
+                            <option value="NONE">Nunca</option>
+                        </select>
+                    </div>
+
+                    <!-- Notification Tone -->
+                    <div class="form-group">
+                        <label>Tono para mensajes nuevos</label>
+                        <select formControlName="notificationTone" class="form-input">
+                            <option value="default">Predeterminado</option>
+                            <option value="chime">Campana</option>
+                            <option value="ding">Timbre</option>
+                            <option value="none">Silencio</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Guardar Configuración</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Privacy Section -->
+            <section *ngIf="activeSection === 'privacy'" class="settings-section">
+                <h2 class="section-title">Privacidad y Seguridad</h2>
+
+                <form [formGroup]="privacyForm" (ngSubmit)="onPrivacySubmit()" class="settings-form">
+                    <!-- Privacy Settings -->
+                    <div class="form-group">
+                        <label>Última vez y En línea</label>
+                        <select formControlName="lastSeenVisibility" class="form-input">
+                            <option value="EVERYONE">Todos</option>
+                            <option value="CONTACTS">Mis contactos</option>
+                            <option value="NOBODY">Nadie</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto de perfil</label>
+                        <select formControlName="profilePictureVisibility" class="form-input">
+                            <option value="EVERYONE">Todos</option>
+                            <option value="CONTACTS">Mis contactos</option>
+                            <option value="NOBODY">Nadie</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Información</label>
+                        <select formControlName="infoVisibility" class="form-input">
+                            <option value="EVERYONE">Todos</option>
+                            <option value="CONTACTS">Mis contactos</option>
+                            <option value="NOBODY">Nadie</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Confirmaciones de lectura</h3>
+                            <p>Mostrar check azul cuando los mensajes sean leídos</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="readReceipts">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Guardar Configuración</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Account Section -->
+            <section *ngIf="activeSection === 'account'" class="settings-section">
+                <h2 class="section-title">Configuración de Cuenta</h2>
+
+                <div class="account-actions">
+                    <div class="account-action">
+                        <h3>Exportar mis datos</h3>
+                        <p>Descarga una copia de tus datos personales</p>
+                        <button class="action-button secondary">Exportar Datos</button>
+                    </div>
+
+                    <div class="account-action danger">
+                        <h3>Eliminar cuenta</h3>
+                        <p>Elimina permanentemente tu cuenta y todos tus datos</p>
+                        <button class="action-button danger">Eliminar Cuenta</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Section -->
+            <section *ngIf="activeSection === 'help'" class="settings-section">
+                <h2 class="section-title">Ayuda y Soporte</h2>
+
+                <div class="help-actions">
+                    <div class="help-item">
+                        <div class="help-icon">
+                            <span class="material-symbols-outlined">quiz</span>
+                        </div>
+                        <div class="help-info">
+                            <h3>Preguntas Frecuentes</h3>
+                            <p>Encuentra respuestas a las preguntas más comunes</p>
+                        </div>
+                    </div>
+
+                    <div class="help-item">
+                        <div class="help-icon">
+                            <span class="material-symbols-outlined">support_agent</span>
+                        </div>
+                        <div class="help-info">
+                            <h3>Contactar con Soporte</h3>
+                            <p>Habla con nuestro equipo para resolver tus dudas</p>
+                        </div>
+                    </div>
+
+                    <div class="help-item">
+                        <div class="help-icon">
+                            <span class="material-symbols-outlined">gavel</span>
+                        </div>
+                        <div class="help-info">
+                            <h3>Términos de Servicio</h3>
+                            <p>Lee nuestros términos, condiciones y política de privacidad</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
