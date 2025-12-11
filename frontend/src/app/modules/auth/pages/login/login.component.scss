@@ -1,5 +1,165 @@
 .login-container {
-    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+}
+
+.login-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.logo-section {
     text-align: center;
-    font-family: 'Inter', sans-serif;
+    margin-bottom: 2rem;
+}
+
+.logo-icon {
+    font-size: 3rem !important;
+    color: #2b6cee;
+    margin-bottom: 0.5rem;
+}
+
+.app-title {
+    color: #2b6cee;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-title {
+    color: #1a202c;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.form-subtitle {
+    color: #718096;
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4a5568;
+    cursor: pointer;
+
+    input {
+        margin: 0;
+    }
+}
+
+.forgot-password {
+    color: #2b6cee;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.submit-button {
+    height: 48px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #a0aec0;
+    margin: 1rem 0;
+
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    span {
+        padding: 0 1rem;
+    }
+}
+
+.social-button {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border-color: #e2e8f0;
+    color: #4a5568;
+
+    &:hover {
+        background-color: #f7fafc;
+    }
+}
+
+.google-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.register-link {
+    text-align: center;
+    color: #718096;
+    margin: 1rem 0 0 0;
+
+    a {
+        color: #2b6cee;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    .login-card {
+        background: #2d3748;
+        color: white;
+    }
+
+    .form-title {
+        color: white;
+    }
+
+    .form-subtitle {
+        color: #cbd5e0;
+    }
 }
