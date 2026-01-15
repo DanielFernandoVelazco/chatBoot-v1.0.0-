@@ -4,6 +4,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { NoAuthGuard } from './core/guards/no-auth.guard';
 
 const routes: Routes = [
+
     {
         path: '',
         canActivate: [AuthGuard],
