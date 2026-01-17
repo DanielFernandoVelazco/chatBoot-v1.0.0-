@@ -7,6 +7,9 @@ spring:
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
   
   jpa:
     hibernate:
@@ -15,7 +18,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    show-sql: false
   
   sql:
     init:
@@ -24,17 +31,34 @@ spring:
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     time-zone: "UTC"
+    serialization:
+      write-dates-as-timestamps: false
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 server:
   port: 8080
   servlet:
     context-path: /api
+  error:
+    include-stacktrace: never
 
 app:
   jwt:
-    secret: "mySecretKeyForJWTTokenGenerationInChatApp2024SecureWith256Bits"
+    secret: "dGhpcy1pcy1hLXZlcnktc2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9u"
     expiration: 86400000 # 24 horas en milisegundos
   cors:
     allowed-origins: "http://localhost:3000"
     allowed-methods: "*"
     allowed-headers: "*"
+
+logging:
+  level:
+    com.chatapp: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
