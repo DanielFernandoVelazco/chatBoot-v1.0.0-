@@ -1,36 +1,48 @@
-# chatBoot-v1.0.0-
+# Chat Application Backend
 
-Endpoints Disponibles:
+Backend para aplicación de chat desarrollado con Spring Boot, PostgreSQL y WebSocket.
 
-Autenticación:
-POST /api/auth/register - Registrar usuario
-POST /api/auth/login - Iniciar sesión
-GET /api/auth/check-username/{username} - Verificar username
-GET /api/auth/check-email/{email} - Verificar email
+## Características
 
-Usuarios:
-GET /api/users/me - Usuario actual
-GET /api/users/{id} - Usuario por ID
-GET /api/users/search?query=... - Buscar usuarios
-PUT /api/users/profile - Actualizar perfil
+- ✅ Autenticación JWT
+- ✅ Chat en tiempo real con WebSocket
+- ✅ Gestión de usuarios y perfiles
+- ✅ Configuración de notificaciones
+- ✅ Configuración de privacidad y seguridad
+- ✅ Base de datos PostgreSQL
+- ✅ API RESTful
+- ✅ Dockerizado
 
-Chats:
-POST /api/chats/private/{userId} - Crear chat privado
-POST /api/chats/group - Crear chat grupal
-GET /api/chats - Listar chats del usuario
+## Tecnologías
 
-Mensajes:
-POST /api/messages/{chatId} - Enviar mensaje
-GET /api/messages/{chatId} - Obtener mensajes (paginado)
+- Java 17
+- Spring Boot 3.2.x
+- Spring Security
+- Spring Data JPA
+- WebSocket (STOMP)
+- PostgreSQL
+- JWT
+- Docker
 
-WebSocket:
-ws://localhost:8081/ws - Endpoint WebSocket
-Suscripciones: /topic/chat/{chatId}, /user/queue/notifications
+## Requisitos Previos
 
-Salud:
-GET /api/health - Health check
+- Java 17 o superior
+- Maven 3.8+
+- PostgreSQL 15+
+- Docker (opcional)
 
-Pruebas Rápidas:
-Health Check: curl http://localhost:8081/api/health
-Registro: Usa los usuarios de prueba creados automáticamente
-Login: Usa credenciales: alexdoe/password123
+## Configuración Local
+
+### 1. Base de Datos
+
+```bash
+# Crear base de datos PostgreSQL
+createdb chatdb
+
+# O usar Docker
+docker run --name chat-postgres \
+  -e POSTGRES_DB=chatdb \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  -d postgres:15-alpine
