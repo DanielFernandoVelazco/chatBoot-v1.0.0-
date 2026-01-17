@@ -13,24 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+        private final UserRepository userRepository;
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(usernameOrEmail)
-                .orElseGet(() -> userRepository.findByEmail(usernameOrEmail)
-                        .orElseThrow(() -> new UsernameNotFoundException(
-                                "User not found with username or email: " + usernameOrEmail)));
+        @Override
+        @Transactional
+        public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+                User user = userRepository.findByUsername(usernameOrEmail)
+                                .orElseGet(() -> userRepository.findByEmail(usernameOrEmail)
+                                                .orElseThrow(() -> new UsernameNotFoundException(
+                                                                "User not found with username or email: "
+                                                                                + usernameOrEmail)));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities(user.getAuthorities())
-                .accountExpired(!user.isAccountNonExpired())
-                .accountLocked(!user.isAccountNonLocked())
-                .credentialsExpired(!user.isCredentialsNonExpired())
-                .disabled(!user.isEnabled())
-                .build();
-    }
+                return UserPrincipal.create(user);
+        }
 }
