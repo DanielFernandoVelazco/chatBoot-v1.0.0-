@@ -3,6 +3,7 @@ package com.chatapp.config;
 import com.chatapp.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,18 +31,30 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
 
+    @Value("${app.security.enabled:true}")
+    private boolean securityEnabled;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("Configuring Security Filter Chain...");
+        if (!securityEnabled) {
+            log.info("Security DISABLED - allowing all requests");
+            return http
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .cors(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                    .build();
+        }
+
+        log.info("Security ENABLED - configuring JWT security");
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(authorize -> {
-                    log.info("Configuring public endpoints...");
                     authorize
                             .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/test/**").permitAll() // Agregar test endpoints
                             .requestMatchers("/error").permitAll()
                             .requestMatchers("/favicon.ico").permitAll()
                             .requestMatchers("/ws/**").permitAll()
@@ -57,7 +70,6 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        log.info("Security configuration completed");
         return http.build();
     }
 
