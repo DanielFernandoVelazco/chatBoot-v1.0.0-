@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +75,14 @@ public class AuthController {
         response.put("authorities", auth != null ? auth.getAuthorities() : "null");
         response.put("isAuthenticated", auth != null && auth.isAuthenticated());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/public-test")
+    public ResponseEntity<Map<String, String>> publicTest() {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "This is a public endpoint");
+        response.put("timestamp", LocalDateTime.now().toString());
         return ResponseEntity.ok(response);
     }
 
