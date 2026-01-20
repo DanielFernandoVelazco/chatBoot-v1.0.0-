@@ -23,21 +23,39 @@ public class UserSettings {
     private User user;
 
     // Privacy settings
+    @Builder.Default
     private boolean showLastSeen = true;
+
+    @Builder.Default
     private boolean showProfilePhoto = true;
+
+    @Builder.Default
     private boolean showStatus = true;
+
+    @Builder.Default
     private String profileVisibility = "EVERYONE"; // EVERYONE, CONTACTS, NOBODY
 
     // Notification settings
+    @Builder.Default
     private boolean desktopNotifications = true;
+
+    @Builder.Default
     private boolean soundNotifications = true;
+
+    @Builder.Default
     private boolean doNotDisturb = false;
+
+    @Builder.Default
     private String notificationTone = "DEFAULT";
+
+    @Builder.Default
     private String notificationType = "ALL"; // ALL, MENTIONS, NONE
 
     // Security settings
+    @Builder.Default
     private boolean twoFactorEnabled = false;
 
     // Theme
+    @Builder.Default
     private String theme = "SYSTEM"; // LIGHT, DARK, SYSTEM
 }
