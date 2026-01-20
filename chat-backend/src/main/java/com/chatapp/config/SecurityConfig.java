@@ -2,6 +2,7 @@ package com.chatapp.config;
 
 import com.chatapp.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -30,40 +32,32 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring Security Filter Chain...");
+
         http
-                // Deshabilitar CSRF y CORS para APIs REST
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
 
-                // Configurar autorización de endpoints
-                .authorizeHttpRequests(authorize -> authorize
-                        // Endpoints públicos
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
+                .authorizeHttpRequests(authorize -> {
+                    log.info("Configuring public endpoints...");
+                    authorize
+                            .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/error").permitAll()
+                            .requestMatchers("/favicon.ico").permitAll()
+                            .requestMatchers("/ws/**").permitAll()
+                            .requestMatchers("/v3/api-docs/**").permitAll()
+                            .requestMatchers("/swagger-ui/**").permitAll()
+                            .requestMatchers("/swagger-ui.html").permitAll()
+                            .anyRequest().authenticated();
+                })
 
-                        // WebSocket endpoints
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/ws").permitAll()
-
-                        // Swagger/OpenAPI
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-
-                        // Todos los demás endpoints requieren autenticación
-                        .anyRequest().authenticated())
-
-                // Configurar sesiones sin estado
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(STATELESS))
 
-                // Configurar proveedor de autenticación
                 .authenticationProvider(authenticationProvider())
-
-                // Agregar filtro JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        log.info("Security configuration completed");
         return http.build();
     }
 
