@@ -36,6 +36,7 @@ public class Message {
 
     private String messageType; // TEXT, IMAGE, FILE, AUDIO
 
+    @Builder.Default
     private boolean isRead = false;
 
     private LocalDateTime readAt;
