@@ -21,5 +21,6 @@ public class MessageRequest {
     @NotBlank(message = "Content is required")
     private String content;
 
+    @Builder.Default
     private String messageType = "TEXT"; // TEXT, IMAGE, FILE, AUDIO
 }
