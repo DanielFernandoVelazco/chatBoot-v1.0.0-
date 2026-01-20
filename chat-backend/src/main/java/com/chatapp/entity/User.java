@@ -23,23 +23,28 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
+    @Column(name = "full_name", length = 100)
     private String fullName;
 
+    @Column(name = "avatar_url", length = 500) // AUMENTADO a 500
     private String avatarUrl;
 
+    @Column(length = 500) // AUMENTADO a 500
     private String bio;
 
+    @Column(length = 100)
     private String status;
 
+    @Column(name = "last_seen")
     private LocalDateTime lastSeen;
 
     private boolean online;
@@ -57,15 +62,19 @@ public class User implements UserDetails {
     @JoinTable(name = "user_chat_rooms", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "chat_room_id"))
     private List<ChatRoom> chatRooms;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        status = "Hey there! I'm using ChatApp";
+        if (status == null) {
+            status = "Hey there! I'm using ChatApp";
+        }
         online = false;
     }
 
