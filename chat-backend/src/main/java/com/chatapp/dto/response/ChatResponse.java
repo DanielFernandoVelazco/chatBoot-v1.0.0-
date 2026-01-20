@@ -23,19 +23,3 @@ public class ChatResponse {
     private List<MessageResponse> messages;
     private int unreadCount;
 }
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-class MessageResponse {
-    private Long id;
-    private Long senderId;
-    private String senderName;
-    private String senderAvatar;
-    private String content;
-    private String messageType;
-    private boolean isRead;
-    private LocalDateTime readAt;
-    private LocalDateTime createdAt;
-}
