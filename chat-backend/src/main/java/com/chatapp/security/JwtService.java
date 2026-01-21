@@ -40,6 +40,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
+
         return buildToken(new HashMap<>(), userDetails, jwtExpiration * 7); // 7 days
     }
 
