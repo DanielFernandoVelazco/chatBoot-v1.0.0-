@@ -11,18 +11,18 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    @Query("SELECT cr FROM ChatRoom cr " +
-            "JOIN cr.participants p " +
-            "WHERE cr.isGroup = false AND p.id IN (:user1Id, :user2Id) " +
-            "GROUP BY cr.id " +
-            "HAVING COUNT(DISTINCT p.id) = 2")
-    Optional<ChatRoom> findPrivateChatRoom(@Param("user1Id") Long user1Id, @Param("user2Id") Long user2Id);
+        @Query("SELECT cr FROM ChatRoom cr " +
+                        "JOIN cr.participants p " +
+                        "WHERE cr.isGroup = false AND p.id IN (:user1Id, :user2Id) " +
+                        "GROUP BY cr.id " +
+                        "HAVING COUNT(DISTINCT p.id) = 2")
+        Optional<ChatRoom> findPrivateChatRoom(@Param("user1Id") Long user1Id, @Param("user2Id") Long user2Id);
 
-    @Query("SELECT cr FROM ChatRoom cr " +
-            "JOIN cr.participants p " +
-            "WHERE p.id = :userId " +
-            "ORDER BY cr.lastMessageAt DESC")
-    List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
+        @Query("SELECT cr FROM ChatRoom cr " +
+                        "JOIN cr.participants p " +
+                        "WHERE p.id = :userId " +
+                        "ORDER BY cr.lastMessageAt DESC")
+        List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
 
-    List<ChatRoom> findByIsGroupTrue();
+        List<ChatRoom> findByIsGroupTrue();
 }
