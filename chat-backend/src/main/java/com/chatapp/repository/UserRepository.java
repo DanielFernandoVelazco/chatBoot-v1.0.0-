@@ -19,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.username LIKE %:search% OR u.fullName LIKE %:search%")
+
     List<User> searchUsers(@Param("search") String search);
 
     List<User> findByOnlineTrue();
