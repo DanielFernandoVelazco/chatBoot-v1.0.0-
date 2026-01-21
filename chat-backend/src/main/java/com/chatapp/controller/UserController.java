@@ -19,6 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
+
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         Long userId = SecurityUtil.getCurrentUserId();
         UserResponse response = userService.getCurrentUser(userId);
