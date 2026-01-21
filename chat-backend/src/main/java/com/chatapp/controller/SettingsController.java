@@ -16,6 +16,7 @@ public class SettingsController {
     private final SettingsService settingsService;
 
     @GetMapping
+
     public ResponseEntity<ApiResponse<UserSettings>> getUserSettings() {
         Long userId = SecurityUtil.getCurrentUserId();
         UserSettings response = settingsService.getUserSettings(userId);
