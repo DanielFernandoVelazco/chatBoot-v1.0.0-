@@ -11,6 +11,7 @@ import java.util.Map;
 public class TestController {
 
     @GetMapping("/public")
+
     public Map<String, String> publicEndpoint() {
         Map<String, String> response = new HashMap<>();
         response.put("message", "This is a PUBLIC test endpoint");
@@ -20,6 +21,7 @@ public class TestController {
     }
 
     @GetMapping("/secured")
+
     public Map<String, String> securedEndpoint() {
         Map<String, String> response = new HashMap<>();
         response.put("message", "This is a SECURED test endpoint");
