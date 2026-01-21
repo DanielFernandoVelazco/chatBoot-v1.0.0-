@@ -67,6 +67,7 @@ public class AuthController {
     }
 
     @GetMapping("/debug")
+
     public ResponseEntity<Map<String, Object>> debugInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -79,6 +80,7 @@ public class AuthController {
     }
 
     @GetMapping("/public-test")
+
     public ResponseEntity<Map<String, String>> publicTest() {
         Map<String, String> response = new HashMap<>();
         response.put("message", "This is a public endpoint");
@@ -106,6 +108,7 @@ public class AuthController {
 
             return ResponseEntity.ok(ApiResponse.success("Test token generated", data));
         } catch (Exception e) {
+
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("Error generating token: " + e.getMessage()));
         }
