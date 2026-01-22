@@ -34,6 +34,7 @@ security:
 app:
   security:
     enabled: false # Nuestra bandera personalizada
+    development-mode: true # Modo desarrollo
 
   jwt:
     secret: "dGhpcy1pcy1hLXZlcnktc2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9u"
