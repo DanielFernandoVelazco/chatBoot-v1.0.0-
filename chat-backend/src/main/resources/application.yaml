@@ -28,8 +28,8 @@ spring:
 # DESACTIVAR SEGURIDAD TEMPORALMENTE
 security:
   basic:
-    enabled: false
-  enabled: false
+    enabled: true
+  enabled: true
 
 app:
   security:
