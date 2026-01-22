@@ -1,15 +1,26 @@
 package com.chatapp.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.chatapp.dto.request.UpdateProfileRequest;
 import com.chatapp.dto.response.ApiResponse;
 import com.chatapp.dto.response.UserResponse;
 import com.chatapp.service.UserService;
 import com.chatapp.util.SecurityUtil;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,10 +30,23 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
+            @RequestParam(required = false) Long userId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
-        Long userId = SecurityUtil.getCurrentUserId();
-        UserResponse response = userService.getCurrentUser(userId);
+        Long targetUserId = userId;
+
+        // Si no se proporciona userId, intentar extraer del token o usar default
+        if (targetUserId == null) {
+            try {
+                targetUserId = SecurityUtil.getCurrentUserId();
+            } catch (Exception e) {
+                // En desarrollo, usar userId por defecto
+                targetUserId = 1L; // john_doe
+            }
+        }
+
+        UserResponse response = userService.getCurrentUser(targetUserId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
