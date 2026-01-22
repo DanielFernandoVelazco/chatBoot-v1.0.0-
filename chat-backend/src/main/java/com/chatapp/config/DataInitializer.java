@@ -1,20 +1,24 @@
 package com.chatapp.config;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.chatapp.entity.ChatRoom;
 import com.chatapp.entity.User;
 import com.chatapp.entity.UserSettings;
 import com.chatapp.repository.ChatRoomRepository;
 import com.chatapp.repository.UserRepository;
 import com.chatapp.repository.UserSettingsRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -107,35 +111,47 @@ public class DataInitializer implements CommandLineRunner {
 
         private void createChatRooms() {
                 List<User> users = userRepository.findAll();
+                System.out.println("📊 Total usuarios: " + users.size());
 
                 if (users.size() >= 2) {
-                        User john = users.get(0);
-                        User elena = users.get(1);
-                        User marcus = users.get(2);
+                        User john = userRepository.findByUsername("john_doe")
+                                        .orElseThrow(() -> new RuntimeException("John not found"));
+                        User elena = userRepository.findByUsername("elena_rodriguez")
+                                        .orElseThrow(() -> new RuntimeException("Elena not found"));
 
-                        // Create private chat room between John and Elena
+                        System.out.println(
+                                        "👥 Creando chat entre: " + john.getUsername() + " y " + elena.getUsername());
+
+                        // Crear chat
                         ChatRoom privateChat = ChatRoom.builder()
                                         .name(john.getUsername() + " & " + elena.getUsername())
                                         .isGroup(false)
-                                        .participants(Arrays.asList(john, elena))
                                         .lastMessage("Perfect! See you then.")
                                         .lastMessageAt(LocalDateTime.now().minusHours(2))
                                         .createdAt(LocalDateTime.now().minusDays(1))
                                         .build();
 
+                        // ESTO ES CRÍTICO: Establecer la relación bidireccional
+                        privateChat.setParticipants(Arrays.asList(john, elena));
+
+                        // Asegurar que las listas en usuarios no sean null
+                        if (john.getChatRooms() == null) {
+                                john.setChatRooms(new ArrayList<>());
+                        }
+                        if (elena.getChatRooms() == null) {
+                                elena.setChatRooms(new ArrayList<>());
+                        }
+
+                        john.getChatRooms().add(privateChat);
+                        elena.getChatRooms().add(privateChat);
+
+                        // Guardar
                         chatRoomRepository.save(privateChat);
+                        userRepository.save(john);
+                        userRepository.save(elena);
 
-                        // Create group chat
-                        ChatRoom groupChat = ChatRoom.builder()
-                                        .name("Project Team")
-                                        .isGroup(true)
-                                        .participants(Arrays.asList(john, elena, marcus))
-                                        .lastMessage("Can you send over the file?")
-                                        .lastMessageAt(LocalDateTime.now().minusHours(1))
-                                        .createdAt(LocalDateTime.now().minusDays(2))
-                                        .build();
-
-                        chatRoomRepository.save(groupChat);
+                        System.out.println("✅ Chat creado: " + privateChat.getName() + " (ID: " + privateChat.getId()
+                                        + ")");
                 }
         }
 }
