@@ -1,27 +1,17 @@
 package com.chatapp.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.chatapp.dto.request.UpdateProfileRequest;
 import com.chatapp.dto.response.ApiResponse;
 import com.chatapp.dto.response.ChatResponse;
 import com.chatapp.dto.response.UserResponse;
+import com.chatapp.service.ChatService;
 import com.chatapp.service.UserService;
 import com.chatapp.util.SecurityUtil;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,25 +19,12 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+    private final ChatService chatService; // Agregar esta línea
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
-            @RequestParam(required = false) Long userId,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        Long targetUserId = userId;
-
-        // Si no se proporciona userId, intentar extraer del token o usar default
-        if (targetUserId == null) {
-            try {
-                targetUserId = SecurityUtil.getCurrentUserId();
-            } catch (Exception e) {
-                // En desarrollo, usar userId por defecto
-                targetUserId = 1L; // john_doe
-            }
-        }
-
-        UserResponse response = userService.getCurrentUser(targetUserId);
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        UserResponse response = userService.getCurrentUser(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -96,6 +73,8 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    // ========== ENDPOINTS DE DESARROLLO ==========
+
     @GetMapping("/dev/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUserDev(
             @RequestParam(defaultValue = "1") Long userId) {
@@ -115,12 +94,8 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @GetMapping("/dev/chats")
-    public ResponseEntity<ApiResponse<List<ChatResponse>>> getUserChatsDev(
-            @RequestParam(defaultValue = "1") Long userId) {
-
-        System.out.println("🔧 ENDPOINT DESARROLLO: Obteniendo chats para usuario: " + userId);
-        List<ChatResponse> response = chatService.getUserChats(userId);
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
+    // NOTA: El endpoint /dev/chats NO debería estar aquí, debería estar en
+    // ChatController
+    // Si lo quieres aquí, necesitas inyectar ChatService
+    // Por ahora, lo voy a comentar o eliminar
 }
