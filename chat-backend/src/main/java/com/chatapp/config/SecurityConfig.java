@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!securityEnabled) {
-            log.info("Security DISABLED - allowing all requests");
+            log.info("🔓 MODO DESARROLLO: Seguridad desactivada - permitiendo todas las peticiones");
             return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .cors(AbstractHttpConfigurer::disable)
@@ -49,16 +49,23 @@ public class SecurityConfig {
                     .build();
         }
 
-        log.info("Security ENABLED - configuring JWT security");
+        // Configuración de producción (JWT)
+        log.info("🔐 MODO PRODUCCIÓN: Configurando seguridad JWT");
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(authorize -> {
-                    // IMPORTANTE: Permitir TODO temporalmente mientras probamos
-                    // Luego cambiaremos a .anyRequest().authenticated()
-                    authorize.anyRequest().permitAll(); // <-- Temporalmente permitir todo
+                    authorize
+                            .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/error").permitAll()
+                            .requestMatchers("/favicon.ico").permitAll()
+                            .requestMatchers("/ws/**").permitAll()
+                            .requestMatchers("/v3/api-docs/**").permitAll()
+                            .requestMatchers("/swagger-ui/**").permitAll()
+                            .requestMatchers("/swagger-ui.html").permitAll()
+                            .anyRequest().authenticated();
                 })
 
                 .sessionManagement(session -> session
