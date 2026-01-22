@@ -1,8 +1,7 @@
 package com.chatapp.config;
 
-import com.chatapp.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
+import com.chatapp.security.JwtAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +37,7 @@ public class SecurityConfig {
     @Value("${app.security.enabled:true}")
     private boolean securityEnabled;
 
+    // En el método securityFilterChain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!securityEnabled) {
@@ -52,16 +56,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(authorize -> {
-                    authorize
-                            .requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/test/**").permitAll() // Agregar test endpoints
-                            .requestMatchers("/error").permitAll()
-                            .requestMatchers("/favicon.ico").permitAll()
-                            .requestMatchers("/ws/**").permitAll()
-                            .requestMatchers("/v3/api-docs/**").permitAll()
-                            .requestMatchers("/swagger-ui/**").permitAll()
-                            .requestMatchers("/swagger-ui.html").permitAll()
-                            .anyRequest().authenticated();
+                    // IMPORTANTE: Permitir TODO temporalmente mientras probamos
+                    // Luego cambiaremos a .anyRequest().authenticated()
+                    authorize.anyRequest().permitAll(); // <-- Temporalmente permitir todo
                 })
 
                 .sessionManagement(session -> session
@@ -86,8 +83,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-
-    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
             throws Exception {
