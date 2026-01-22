@@ -1,18 +1,7 @@
 package com.chatapp.entity;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-
 public class UserSettings {
 
     @Id
@@ -34,7 +21,7 @@ public class UserSettings {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference // <-- Agregar esta anotación
+    @JsonBackReference
     private User user;
 
     // Privacy settings
@@ -73,23 +60,4 @@ public class UserSettings {
     // Theme
     @Builder.Default
     private String theme = "SYSTEM"; // LIGHT, DARK, SYSTEM
-
-    // Agregar métodos toString() y hashCode() que eviten recursión
-    @Override
-    public String toString() {
-        return "UserSettings{" +
-                "id=" + id +
-                ", userId=" + (user != null ? user.getId() : "null") +
-                ", showLastSeen=" + showLastSeen +
-                ", theme='" + theme + '\'' +
-                '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, showLastSeen, showProfilePhoto, showStatus,
-                profileVisibility, desktopNotifications,
-                soundNotifications, doNotDisturb, notificationTone,
-                notificationType, twoFactorEnabled, theme);
-    }
 }
