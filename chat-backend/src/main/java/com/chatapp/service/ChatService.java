@@ -66,8 +66,17 @@ public class ChatService {
         }
 
         public List<ChatResponse> getUserChats(Long userId) {
-                return chatRoomRepository.findChatRoomsByUserId(userId).stream()
-                                .map(this::convertToChatResponse)
+                System.out.println("🔍 Buscando chats para usuario ID: " + userId);
+
+                List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByUserId(userId);
+                System.out.println("📊 Chat rooms encontrados: " + chatRooms.size());
+
+                return chatRooms.stream()
+                                .map(chatRoom -> {
+                                        System.out.println("💬 Procesando chat: " + chatRoom.getName() + " (ID: "
+                                                        + chatRoom.getId() + ")");
+                                        return convertToChatResponse(chatRoom);
+                                })
                                 .collect(Collectors.toList());
         }
 
