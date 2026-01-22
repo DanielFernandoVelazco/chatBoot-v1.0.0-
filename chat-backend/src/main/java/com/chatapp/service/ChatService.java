@@ -1,5 +1,12 @@
 package com.chatapp.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.chatapp.dto.request.MessageRequest;
 import com.chatapp.dto.response.ChatResponse;
 import com.chatapp.dto.response.MessageResponse;
@@ -11,12 +18,8 @@ import com.chatapp.repository.ChatRoomRepository;
 import com.chatapp.repository.MessageRepository;
 import com.chatapp.repository.UserRepository;
 import com.chatapp.repository.UserSettingsRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
