@@ -7,6 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class User implements UserDetails {
 
     @Id
@@ -50,6 +57,7 @@ public class User implements UserDetails {
     private boolean online;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // <-- Agregar esta anotación
     private UserSettings settings;
 
     @OneToMany(mappedBy = "sender")
