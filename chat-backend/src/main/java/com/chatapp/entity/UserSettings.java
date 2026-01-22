@@ -1,6 +1,12 @@
 package com.chatapp.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -58,4 +64,23 @@ public class UserSettings {
     // Theme
     @Builder.Default
     private String theme = "SYSTEM"; // LIGHT, DARK, SYSTEM
+
+    // Agregar métodos toString() y hashCode() que eviten recursión
+    @Override
+    public String toString() {
+        return "UserSettings{" +
+                "id=" + id +
+                ", userId=" + (user != null ? user.getId() : "null") +
+                ", showLastSeen=" + showLastSeen +
+                ", theme='" + theme + '\'' +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, showLastSeen, showProfilePhoto, showStatus,
+                profileVisibility, desktopNotifications,
+                soundNotifications, doNotDisturb, notificationTone,
+                notificationType, twoFactorEnabled, theme);
+    }
 }
