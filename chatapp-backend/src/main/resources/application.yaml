@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/chatapp_db
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://localhost:5432/chatdb
+    username: fernandovelazco
+    password: Colombia.123
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -11,3 +11,5 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8081
