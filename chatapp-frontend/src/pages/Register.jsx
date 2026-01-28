@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Register = () => {
+const Register = ({ onToggle }) => {
     const [formData, setFormData] = useState({
         nombreCompleto: '',
         email: '',
@@ -110,9 +110,15 @@ const Register = () => {
                     Al registrarte, aceptas nuestros Términos de Servicio.
                 </p>
 
+                {/* AQUÍ ESTÁ LA CORRECCIÓN: Botón que usa la propiedad onToggle */}
                 <div className="mt-4 text-center">
                     <span className="text-sm text-gray-400">¿Ya tienes una cuenta? </span>
-                    <span className="text-sm text-blue-400 hover:text-blue-300 font-semibold cursor-pointer">Inicia sesión</span>
+                    <button
+                        onClick={onToggle}
+                        className="text-sm text-blue-400 hover:text-blue-300 font-semibold"
+                    >
+                        Inicia sesión
+                    </button>
                 </div>
             </div>
         </div>
