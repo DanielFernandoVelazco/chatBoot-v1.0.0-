@@ -1,48 +1,101 @@
-# Chat Application Backend
+ChatApp Backend (Spring Boot + PostgreSQL)
+API RESTful para una aplicación de mensajería instantánea. Desarrollada con Java 17, Spring Boot, JPA y PostgreSQL.
 
-Backend para aplicación de chat desarrollado con Spring Boot, PostgreSQL y WebSocket.
+🛠 Tech Stack
+Java 17
+Spring Boot 3.x
+Spring Data JPA
+Spring Security
+PostgreSQL
+Maven
+Lombok
+📋 Requisitos Previos
+Java 17 instalado.
+Maven instalado.
+Docker (opcional, recomendado para la base de datos).
+🚀 Instalación y Ejecución
+Clonar el repositorio y entrar en el directorio:
+cd chatapp-backend
+Configurar la Base de Datos (Docker):
+Ejecuta el siguiente comando para levantar una instancia de PostgreSQL rápidamente:
 
-## Características
+docker run --name chatapp-postgres -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=chatapp_db -p 5432:5432 -d postgres:latest
 
-- ✅ Autenticación JWT
-- ✅ Chat en tiempo real con WebSocket
-- ✅ Gestión de usuarios y perfiles
-- ✅ Configuración de notificaciones
-- ✅ Configuración de privacidad y seguridad
-- ✅ Base de datos PostgreSQL
-- ✅ API RESTful
-- ✅ Dockerizado
+Configurar Variables de Entorno:
+Copia el archivo de ejemplo:
 
-## Tecnologías
+cp .env.example .env
 
-- Java 17
-- Spring Boot 3.2.x
-- Spring Security
-- Spring Data JPA
-- WebSocket (STOMP)
-- PostgreSQL
-- JWT
-- Docker
+(Edita .env si necesitas cambiar el puerto o la contraseña).
+Compilar el proyecto:
 
-## Requisitos Previos
+mvn clean install
 
-- Java 17 o superior
-- Maven 3.8+
-- PostgreSQL 15+
-- Docker (opcional)
+Ejecutar la aplicación:
 
-## Configuración Local
+mvn spring-boot:run
 
-### 1. Base de Datos
+La aplicación iniciará en http://localhost:8081.
+🧪 Ejecutar Tests
+Para ejecutar los tests de integración y unitarios:
 
-```bash
-# Crear base de datos PostgreSQL
-createdb chatdb
+mvn test
 
-# O usar Docker
-docker run --name chat-postgres \
-  -e POSTGRES_DB=chatdb \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=password \
-  -p 5432:5432 \
-  -d postgres:15-alpine
+🏗 Estructura del Proyecto
+
+src/
+├── main/
+│   ├── java/
+│   │   └── com/chatapp/chatapp_backend/
+│   │       ├── ChatappBackendApplication.java
+│   │       ├── config/
+│   │       │   └── SecurityConfig.java        # Configuración de Seguridad y CORS
+│   │       ├── controller/
+│   │       │   └── AuthController.java        # Endpoints de Autenticación
+│   │       ├── dto/
+│   │       │   ├── UserRegistrationDto.java  # Datos de entrada
+│   │       │   └── UserResponseDto.java      # Datos de salida (Sin password)
+│   │       ├── model/
+│   │       │   └── User.java                 # Entidad JPA
+│   │       ├── repository/
+│   │       │   └── UserRepository.java        # Interfaz JPA
+│   │       └── service/
+│   │           ├── UserService.java           # Interfaz Servicio
+│   │           └── UserServiceImpl.java      # Lógica de Negocio
+│   └── resources/
+│       └── application.yaml                  # Configuración (usa variables de entorno)
+└── test/
+    └── java/
+        └── com/chatapp/chatapp_backend/
+            └── repository/
+                └── UserRepositoryTest.java    # Tests de integración DB
+
+📡 Endpoints (API)
+Registro de Usuario
+POST /api/auth/register
+Descripción: Registra un nuevo usuario en la base de datos.
+Body (JSON):
+
+{
+  "username": "ejemplo_usuario",
+  "email": "usuario@ejemplo.com",
+  "password": "password123"
+}
+
+Response (200 OK):
+
+{
+  "id": 1,
+  "username": "ejemplo_usuario",
+  "email": "usuario@ejemplo.com",
+  "profilePhotoUrl": null,
+  "bio": null,
+  "online": false,
+  "createdAt": "2024-01-26T21:00:00"
+}
+
+🔐 Seguridad
+El proyecto utiliza Spring Security.
+Los endpoints bajo /api/auth/** son públicos.
+Se ha configurado CORS para permitir conexiones desde el frontend (por defecto *).
+*Nota: La contraseña aún no está encriptada en esta fase (Próximo paso de mejora).
