@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/chatdb
-    username: fernandovelazco
-    password: Colombia.123
+    # Si existe la variable DB_URL la usa, si no, usa tu URL actual
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -11,5 +12,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
 server:
-  port: 8081
+  port: ${SERVER_PORT}
