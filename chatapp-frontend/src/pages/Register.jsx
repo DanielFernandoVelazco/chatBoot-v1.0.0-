@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Register = ({ onToggle }) => {
+const Register = ({ onToggle, onRegisterSuccess }) => {
     const [formData, setFormData] = useState({
         nombreCompleto: '',
         email: '',
@@ -33,6 +33,7 @@ const Register = ({ onToggle }) => {
             });
 
             alert('Usuario registrado con éxito: ' + response.data.username);
+            onRegisterSuccess(); // AGREGAR ESTO
 
         } catch (error) {
             console.error(error);
