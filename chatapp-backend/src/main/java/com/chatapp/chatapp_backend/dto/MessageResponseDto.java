@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class MessageResponseDto {
     private Long id;
     private Long senderId;
-    private String content; // Agregaremos senderName después si es necesario
+    private String senderName; // CAMBIO: Agregar nombre
+    private String content;
     private LocalDateTime timestamp;
 }
