@@ -1,23 +1,37 @@
 import React, { useState } from 'react';
-// Estas rutas asumen que tienes la carpeta 'pages' dentro de 'src'
 import Register from './pages/Register';
 import Login from './pages/Login';
+import MainChat from './pages/MainChat';
 
 function App() {
-    // Estado para controlar qué pantalla mostrar
-    const [isLogin, setIsLogin] = useState(false);
+    const [view, setView] = useState('register'); // 'register', 'login', 'chat'
+    const [currentUser, setCurrentUser] = useState(null);
 
-    const toggleView = () => {
-        setIsLogin(!isLogin);
+    const handleRegisterSuccess = () => {
+        setView('login');
+    };
+
+    const handleLoginSuccess = (userData) => {
+        setCurrentUser(userData); // Guardamos los datos del usuario que devolvió el backend
+        setView('chat');
+    };
+
+    const handleLogout = () => {
+        setCurrentUser(null);
+        setView('login');
     };
 
     return (
         <div className="App">
-            {/* Si isLogin es true muestra Login, si no muestra Register */}
-            {isLogin ? (
-                <Login onToggle={toggleView} />
+            {view === 'chat' ? (
+                // Si estamos en chat, pasamos el usuario y la función de logout
+                <MainChat user={currentUser} onLogout={handleLogout} />
+            ) : view === 'login' ? (
+                // Pasamos la función para cambiar a chat al login
+                <Login onToggle={() => setView('register')} onLogin={handleLoginSuccess} />
             ) : (
-                <Register onToggle={toggleView} />
+                // Pasamos la función para cambiar a login al registro
+                <Register onToggle={() => setView('login')} onRegisterSuccess={handleRegisterSuccess} />
             )}
         </div>
     );
