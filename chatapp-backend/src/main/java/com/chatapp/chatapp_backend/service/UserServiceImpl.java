@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -15,7 +18,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // Inyectamos el encriptador
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
@@ -26,10 +29,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(registrationDto.getUsername());
         user.setEmail(registrationDto.getEmail());
-
-        // ENCRIPTAR CONTRASEÑA ANTES DE GUARDAR
         user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-
         user.setOnline(false);
 
         User savedUser = userRepository.save(user);
@@ -43,20 +43,24 @@ public class UserServiceImpl implements UserService {
         return mapToResponseDto(user);
     }
 
-    // Nuevo método para el Login
     @Override
     public UserResponseDto loginUser(String email, String rawPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar la contraseña encriptada
         if (passwordEncoder.matches(rawPassword, user.getPassword())) {
-            // Aquí en el futuro generaríamos un Token (JWT)
-            // Por ahora devolvemos el usuario
             return mapToResponseDto(user);
         } else {
             throw new RuntimeException("Contraseña incorrecta");
         }
+    }
+
+    @Override
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     private UserResponseDto mapToResponseDto(User user) {
