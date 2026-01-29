@@ -5,6 +5,8 @@ import com.chatapp.chatapp_backend.dto.UserResponseDto;
 
 public interface UserService {
     UserResponseDto registerUser(UserRegistrationDto registrationDto);
-
     UserResponseDto findByEmail(String email);
+
+    // AGREGAR ESTA LÍNEA:
+    UserResponseDto loginUser(String email, String rawPassword);
 }
