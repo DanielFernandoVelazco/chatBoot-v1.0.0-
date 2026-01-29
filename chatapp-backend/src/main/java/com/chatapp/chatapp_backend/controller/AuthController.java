@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +32,12 @@ public class AuthController {
             // Retornamos BAD_REQUEST sin cuerpo
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserResponseDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/login")
