@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
@@ -27,6 +29,19 @@ public class AuthController {
         } catch (RuntimeException e) {
             // Retornamos BAD_REQUEST sin cuerpo
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> loginUser(@RequestBody Map<String, String> loginRequest) {
+        try {
+            String email = loginRequest.get("email"); // Esperamos email en el cuerpo
+            String password = loginRequest.get("password");
+
+            UserResponseDto user = userService.loginUser(email, password);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }
