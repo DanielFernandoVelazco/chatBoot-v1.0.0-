@@ -5,6 +5,7 @@ import com.chatapp.chatapp_backend.dto.UserResponseDto;
 import com.chatapp.chatapp_backend.model.User;
 import com.chatapp.chatapp_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,24 +14,25 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Inyectamos el encriptador
+
     @Override
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
-        // 1. Verificar si el email ya existe
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // 2. Convertir DTO a Entidad
         User user = new User();
         user.setUsername(registrationDto.getUsername());
         user.setEmail(registrationDto.getEmail());
-        user.setPassword(registrationDto.getPassword()); // TODO: Encriptar en paso de Seguridad
+
+        // ENCRIPTAR CONTRASEÑA ANTES DE GUARDAR
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+
         user.setOnline(false);
 
-        // 3. Guardar
         User savedUser = userRepository.save(user);
-
-        // 4. Convertir Entidad a DTO y retornar
         return mapToResponseDto(savedUser);
     }
 
@@ -41,7 +43,22 @@ public class UserServiceImpl implements UserService {
         return mapToResponseDto(user);
     }
 
-    // Método auxiliar para mapear manualmente (sin ModelMapper)
+    // Nuevo método para el Login
+    @Override
+    public UserResponseDto loginUser(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar la contraseña encriptada
+        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+            // Aquí en el futuro generaríamos un Token (JWT)
+            // Por ahora devolvemos el usuario
+            return mapToResponseDto(user);
+        } else {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+    }
+
     private UserResponseDto mapToResponseDto(User user) {
         UserResponseDto dto = new UserResponseDto();
         dto.setId(user.getId());
