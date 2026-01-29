@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Login = ({ onToggle }) => {
+const Login = ({ onToggle, onLogin }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -20,13 +20,12 @@ const Login = ({ onToggle }) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:8081/api/auth/login', {
-                email: formData.email, // Asegúrate de usar email para buscar
+                email: formData.email,
                 password: formData.password
             });
 
-            alert(`Bienvenido de nuevo, ${response.data.username}!`);
-            console.log("Usuario logueado:", response.data);
-            // Aquí guardaremos el usuario en el contexto más adelante
+            // CAMBIO: En lugar de alert, llamamos a la función de App.jsx
+            onLogin(response.data);
 
         } catch (error) {
             console.error(error);
