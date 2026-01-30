@@ -2,6 +2,7 @@ package com.chatapp.chatapp_backend.service;
 
 import com.chatapp.chatapp_backend.dto.UserRegistrationDto;
 import com.chatapp.chatapp_backend.dto.UserResponseDto;
+import com.chatapp.chatapp_backend.dto.UserUpdateDto;
 import com.chatapp.chatapp_backend.model.User;
 import com.chatapp.chatapp_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,5 +74,25 @@ public class UserServiceImpl implements UserService {
         dto.setOnline(user.getOnline());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
+    }
+
+    @Override
+    public UserResponseDto updateUser(Long userId, UserUpdateDto updateDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Validar nombre de usuario único si se está cambiando
+        if (!user.getUsername().equals(updateDto.getUsername())) {
+            if (userRepository.existsByUsername(updateDto.getUsername())) {
+                throw new RuntimeException("El nombre de usuario ya está en uso");
+            }
+        }
+
+        user.setUsername(updateDto.getUsername());
+        user.setBio(updateDto.getBio());
+        user.setProfilePhotoUrl(updateDto.getProfilePhotoUrl());
+
+        User updatedUser = userRepository.save(user);
+        return mapToResponseDto(updatedUser);
     }
 }
