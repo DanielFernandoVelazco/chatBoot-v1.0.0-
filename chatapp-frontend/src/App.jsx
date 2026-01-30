@@ -6,6 +6,7 @@ import EditProfile from './pages/EditProfile';
 import AccountSettings from './pages/AccountSettings';
 import PrivacySecurity from './pages/PrivacySecurity';
 import NotificationsSettings from './pages/NotificationsSettings';
+import HelpSupport from './pages/HelpSupport';
 
 function App() {
     const [view, setView] = useState('login');
@@ -52,6 +53,7 @@ function App() {
                     onLogout={handleLogout}
                     onEditProfile={() => setView('edit-profile')}
                     onAccountSettings={() => setView('account-settings')}
+                    onHelp={() => setView('help')}
                 />
             ) : view === 'edit-profile' && currentUser ? (
                 <EditProfile
@@ -76,6 +78,10 @@ function App() {
                 <NotificationsSettings
                     user={currentUser}
                     onBack={() => setView('privacy-security')}
+                />
+            ) : view === 'help' && currentUser ? (
+                <HelpSupport
+                    onBack={() => setView('chat')}
                 />
             ) : view === 'login' ? (
                 <Login onToggle={() => setView('register')} onLogin={handleLoginSuccess} />
