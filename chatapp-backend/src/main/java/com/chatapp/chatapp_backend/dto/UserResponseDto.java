@@ -18,4 +18,5 @@ public class UserResponseDto {
     private String bio;
     private Boolean online;
     private LocalDateTime createdAt;
+    private Boolean notificationsEnabled;
 }
