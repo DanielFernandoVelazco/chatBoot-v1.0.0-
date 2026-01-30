@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const MainChat = ({ user, onLogout, onEditProfile }) => {
+const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) => {
     const [contacts, setContacts] = useState([]);
     const [selectedContactId, setSelectedContactId] = useState(null);
     const [selectedContactName, setSelectedContactName] = useState("");
@@ -101,6 +101,15 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
 
                     {/* BOTONES DE ACCIÓN */}
                     <div className="flex gap-2">
+                        {/* Botón Ayuda */}
+                        <button
+                            onClick={onHelp}
+                            className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
+                            title="Ayuda"
+                        >
+                            ❓
+                        </button>
+
                         {/* Botón Cerrar Sesión */}
                         <button
                             onClick={onLogout}
