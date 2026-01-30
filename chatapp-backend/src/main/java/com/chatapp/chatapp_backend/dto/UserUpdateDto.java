@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class UserUpdateDto {
     private String username;
     private String bio;
-    private String profilePhotoUrl; // URL de la imagen
+    private String profilePhotoUrl;
+    private Boolean notificationsEnabled;
 }
