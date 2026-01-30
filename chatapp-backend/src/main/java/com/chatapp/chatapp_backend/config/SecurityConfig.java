@@ -20,10 +20,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Deshabilitar CSRF (necesario para APIs REST sin formularios)
                 .csrf(csrf -> csrf.disable())
+                // Habilitar CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/messages/**").permitAll() // Auth y Messages son públicos
+                        // PERMITE TODO lo que esté en /api/auth/ (registro, login, lista de usuarios, etc)
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // PERMITE todo lo que esté en /api/messages/ (enviar mensajes, historial)
+                        .requestMatchers("/api/messages/**").permitAll()
+                        // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 );
 
@@ -32,14 +39,14 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Encriptador estándar
+        return new BCryptPasswordEncoder();
     }
 
-    // ... (el método corsConfigurationSource se mantiene igual que antes)
+    // Configuración para permitir peticiones desde React (Frontend)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("*")); // En producción, poner la URL de React
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 
