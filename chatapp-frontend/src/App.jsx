@@ -1,29 +1,26 @@
-import React, { useState, useEffect } from 'react'; // Agregar useEffect
+import React, { useState, useEffect } from 'react';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import MainChat from './pages/MainChat';
+import EditProfile from './pages/EditProfile'; // Importar
 
 function App() {
-    const [view, setView] = useState('register');
+    const [view, setView] = useState('login');
     const [currentUser, setCurrentUser] = useState(null);
 
-    // 1. AL CARGAR LA APP: Verificar si hay usuario guardado
     useEffect(() => {
         const savedUser = localStorage.getItem('chatUser');
         if (savedUser) {
             setCurrentUser(JSON.parse(savedUser));
             setView('chat');
         } else {
-            setView('login'); // Si no hay usuario, ir al login por defecto
+            setView('login');
         }
     }, []);
 
-    const handleRegisterSuccess = () => {
-        setView('login');
-    };
+    const handleRegisterSuccess = () => setView('login');
 
     const handleLoginSuccess = (userData) => {
-        // 2. AL LOGUEAR: Guardar usuario en memoria y en localStorage
         setCurrentUser(userData);
         localStorage.setItem('chatUser', JSON.stringify(userData));
         setView('chat');
@@ -31,15 +28,29 @@ function App() {
 
     const handleLogout = () => {
         setCurrentUser(null);
-        localStorage.removeItem('chatUser'); // Borrar del navegador
+        localStorage.removeItem('chatUser');
         setView('login');
+    };
+
+    const handleUpdateProfile = (updatedUserData) => {
+        setCurrentUser(updatedUserData);
+        localStorage.setItem('chatUser', JSON.stringify(updatedUserData));
+        setView('chat'); // Volver al chat
     };
 
     return (
         <div className="App">
             {view === 'chat' && currentUser ? (
-                // Solo mostramos chat si existe el usuario
-                <MainChat user={currentUser} onLogout={handleLogout} />
+                <MainChat
+                    user={currentUser}
+                    onLogout={handleLogout}
+                    onEditProfile={() => setView('edit-profile')} // Pasa la función
+                />
+            ) : view === 'edit-profile' && currentUser ? (
+                <EditProfile
+                    user={currentUser}
+                    onSave={handleUpdateProfile}
+                />
             ) : view === 'login' ? (
                 <Login onToggle={() => setView('register')} onLogin={handleLoginSuccess} />
             ) : (
