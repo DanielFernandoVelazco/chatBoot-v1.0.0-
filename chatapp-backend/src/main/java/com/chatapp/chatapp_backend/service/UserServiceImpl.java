@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService {
         dto.setProfilePhotoUrl(user.getProfilePhotoUrl());
         dto.setBio(user.getBio());
         dto.setOnline(user.getOnline());
+        dto.setNotificationsEnabled(user.getNotificationsEnabled()); // AGREGAR ESTO
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
     }
