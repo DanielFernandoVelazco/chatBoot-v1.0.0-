@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import MainChat from './pages/MainChat';
-import EditProfile from './pages/EditProfile'; // Importar
+import EditProfile from './pages/EditProfile';
+import AccountSettings from './pages/AccountSettings'; // Importar nuevo
 
 function App() {
     const [view, setView] = useState('login');
@@ -35,7 +36,7 @@ function App() {
     const handleUpdateProfile = (updatedUserData) => {
         setCurrentUser(updatedUserData);
         localStorage.setItem('chatUser', JSON.stringify(updatedUserData));
-        setView('chat'); // Volver al chat
+        setView('chat');
     };
 
     return (
@@ -44,12 +45,20 @@ function App() {
                 <MainChat
                     user={currentUser}
                     onLogout={handleLogout}
-                    onEditProfile={() => setView('edit-profile')} // Pasa la función
+                    onEditProfile={() => setView('edit-profile')}
+                    onAccountSettings={() => setView('account-settings')} // Añadir prop
                 />
             ) : view === 'edit-profile' && currentUser ? (
                 <EditProfile
                     user={currentUser}
                     onSave={handleUpdateProfile}
+                    onAccountSettings={() => setView('account-settings')} // Pasar ruta
+                    onBack={() => setView('chat')}
+                />
+            ) : view === 'account-settings' && currentUser ? (
+                <AccountSettings
+                    user={currentUser}
+                    onBack={() => setView('edit-profile')} // Volver a editar perfil
                 />
             ) : view === 'login' ? (
                 <Login onToggle={() => setView('register')} onLogin={handleLoginSuccess} />
