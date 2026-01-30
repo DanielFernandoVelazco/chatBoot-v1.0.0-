@@ -23,8 +23,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Solo auth es público
-                        .anyRequest().authenticated() // Todo lo demás requiere login
+                        .requestMatchers("/api/auth/**", "/api/messages/**").permitAll() // Auth y Messages son públicos
+                        .anyRequest().authenticated()
                 );
 
         return http.build();
