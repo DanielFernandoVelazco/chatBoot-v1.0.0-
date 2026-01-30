@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const EditProfile = ({ user, onSave }) => {
+const EditProfile = ({ user, onSave, onAccountSettings, onBack }) => {
     const [formData, setFormData] = useState({
         username: '',
         bio: '',
@@ -9,8 +9,8 @@ const EditProfile = ({ user, onSave }) => {
     });
     const [error, setError] = useState('');
 
+    // Cargar datos del usuario al montar el componente
     useEffect(() => {
-        // Cargar datos actuales del usuario al montar
         if (user) {
             setFormData({
                 username: user.username,
@@ -30,13 +30,18 @@ const EditProfile = ({ user, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
         try {
             const response = await axios.put(`http://localhost:8081/api/auth/users/${user.id}`, formData);
             alert('Perfil actualizado correctamente');
-            onSave(response.data); // Retornamos el usuario actualizado al MainChat
+            onSave(response.data); // Actualizar usuario en App.jsx
         } catch (error) {
             console.error(error);
-            setError('Error al actualizar perfil. El nombre de usuario podría estar en uso.');
+            if (error.response && error.response.status === 400) {
+                setError('Error al actualizar perfil. El nombre de usuario podría estar en uso.');
+            } else {
+                setError('Hubo un error de conexión con el servidor.');
+            }
         }
     };
 
@@ -46,9 +51,9 @@ const EditProfile = ({ user, onSave }) => {
 
                 <h2 className="text-2xl font-bold text-white mb-6 text-center">Editar Perfil</h2>
 
-                {/* Avatar Preview (Simulado) */}
+                {/* Vista Previa del Avatar */}
                 <div className="flex flex-col items-center mb-6">
-                    <div className="w-24 h-24 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-3xl overflow-hidden mb-2">
+                    <div className="w-24 h-24 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-3xl overflow-hidden mb-2 relative">
                         {formData.profilePhotoUrl ? (
                             <img src={formData.profilePhotoUrl} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
@@ -56,12 +61,9 @@ const EditProfile = ({ user, onSave }) => {
                         )}
                     </div>
                     <p className="text-xs text-gray-400">Foto de Perfil</p>
-                    <button className="text-blue-400 text-xs hover:underline mt-1">
-                        Cambiar Foto (URL)
-                    </button>
                 </div>
 
-                {error && <div className="bg-red-500/20 text-red-400 p-2 rounded mb-4 text-sm">{error}</div>}
+                {error && <div className="bg-red-500/20 text-red-400 p-2 rounded mb-4 text-sm text-center">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -109,12 +111,23 @@ const EditProfile = ({ user, onSave }) => {
 
                     <button
                         type="button"
-                        onClick={onSave} // Simplemente cerrar si cancela (por ahora lo usamos para volver)
+                        onClick={onBack}
                         className="w-full bg-transparent text-gray-400 hover:text-white font-medium py-2 px-4 rounded transition duration-300"
                     >
                         Cancelar
                     </button>
                 </form>
+
+                {/* Enlace a Ajustes de Cuenta */}
+                <div className="mt-6 border-t border-slate-700 pt-4">
+                    <button
+                        onClick={onAccountSettings}
+                        className="w-full text-sm text-gray-400 hover:text-white flex items-center justify-center gap-2 py-2 rounded hover:bg-slate-700 transition"
+                    >
+                        ⚙️ Ir a Ajustes de Cuenta y Seguridad
+                    </button>
+                </div>
+
             </div>
         </div>
     );
