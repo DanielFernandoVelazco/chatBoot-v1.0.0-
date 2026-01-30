@@ -1,5 +1,6 @@
 package com.chatapp.chatapp_backend.service;
 
+import com.chatapp.chatapp_backend.dto.UserChangePasswordDto;
 import com.chatapp.chatapp_backend.dto.UserRegistrationDto;
 import com.chatapp.chatapp_backend.dto.UserResponseDto;
 import com.chatapp.chatapp_backend.dto.UserUpdateDto;
@@ -94,5 +95,20 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
         return mapToResponseDto(updatedUser);
+    }
+
+    @Override
+    public void changePassword(Long userId, UserChangePasswordDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 1. Verificar que la contraseña antigua sea correcta
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("La contraseña actual es incorrecta");
+        }
+
+        // 2. Encriptar y guardar la nueva
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 }
