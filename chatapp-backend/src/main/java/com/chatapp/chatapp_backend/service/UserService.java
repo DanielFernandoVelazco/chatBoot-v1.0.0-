@@ -1,5 +1,6 @@
 package com.chatapp.chatapp_backend.service;
 
+import com.chatapp.chatapp_backend.dto.UserChangePasswordDto;
 import com.chatapp.chatapp_backend.dto.UserRegistrationDto;
 import com.chatapp.chatapp_backend.dto.UserResponseDto;
 import com.chatapp.chatapp_backend.dto.UserUpdateDto;
@@ -16,4 +17,6 @@ public interface UserService {
     List<UserResponseDto> getAllUsers();
 
     UserResponseDto updateUser(Long userId, UserUpdateDto updateDto);
+
+    void changePassword(Long userId, UserChangePasswordDto dto);
 }
