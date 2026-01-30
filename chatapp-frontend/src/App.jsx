@@ -3,12 +3,15 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import MainChat from './pages/MainChat';
 import EditProfile from './pages/EditProfile';
-import AccountSettings from './pages/AccountSettings'; // Importar nuevo
+import AccountSettings from './pages/AccountSettings';
+import PrivacySecurity from './pages/PrivacySecurity';
+import NotificationsSettings from './pages/NotificationsSettings';
 
 function App() {
     const [view, setView] = useState('login');
     const [currentUser, setCurrentUser] = useState(null);
 
+    // 1. Cargar sesión al iniciar la App
     useEffect(() => {
         const savedUser = localStorage.getItem('chatUser');
         if (savedUser) {
@@ -19,7 +22,9 @@ function App() {
         }
     }, []);
 
-    const handleRegisterSuccess = () => setView('login');
+    const handleRegisterSuccess = () => {
+        setView('login');
+    };
 
     const handleLoginSuccess = (userData) => {
         setCurrentUser(userData);
@@ -46,19 +51,31 @@ function App() {
                     user={currentUser}
                     onLogout={handleLogout}
                     onEditProfile={() => setView('edit-profile')}
-                    onAccountSettings={() => setView('account-settings')} // Añadir prop
+                    onAccountSettings={() => setView('account-settings')}
                 />
             ) : view === 'edit-profile' && currentUser ? (
                 <EditProfile
                     user={currentUser}
                     onSave={handleUpdateProfile}
-                    onAccountSettings={() => setView('account-settings')} // Pasar ruta
+                    onAccountSettings={() => setView('account-settings')}
                     onBack={() => setView('chat')}
                 />
             ) : view === 'account-settings' && currentUser ? (
                 <AccountSettings
                     user={currentUser}
-                    onBack={() => setView('edit-profile')} // Volver a editar perfil
+                    onBack={() => setView('edit-profile')}
+                    onPrivacy={() => setView('privacy-security')}
+                />
+            ) : view === 'privacy-security' && currentUser ? (
+                <PrivacySecurity
+                    user={currentUser}
+                    onBack={() => setView('account-settings')}
+                    onNotifications={() => setView('notifications-settings')}
+                />
+            ) : view === 'notifications-settings' && currentUser ? (
+                <NotificationsSettings
+                    user={currentUser}
+                    onBack={() => setView('privacy-security')}
                 />
             ) : view === 'login' ? (
                 <Login onToggle={() => setView('register')} onLogin={handleLoginSuccess} />
