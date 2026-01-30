@@ -33,6 +33,9 @@ public class User {
     @Column(nullable = false)
     private Boolean online = false;
 
+    @Column(nullable = false)
+    private Boolean notificationsEnabled = true;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
