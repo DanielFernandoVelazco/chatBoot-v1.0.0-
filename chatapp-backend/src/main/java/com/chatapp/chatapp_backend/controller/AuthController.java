@@ -1,5 +1,6 @@
 package com.chatapp.chatapp_backend.controller;
 
+import com.chatapp.chatapp_backend.dto.UserChangePasswordDto;
 import com.chatapp.chatapp_backend.dto.UserRegistrationDto;
 import com.chatapp.chatapp_backend.dto.UserResponseDto;
 import com.chatapp.chatapp_backend.dto.UserUpdateDto;
@@ -51,6 +52,18 @@ public class AuthController {
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/users/{id}/change-password")
+    public ResponseEntity<Void> changePassword(
+            @PathVariable Long id,
+            @RequestBody UserChangePasswordDto dto) {
+        try {
+            userService.changePassword(id, dto);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
