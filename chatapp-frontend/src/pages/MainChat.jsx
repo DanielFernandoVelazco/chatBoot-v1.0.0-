@@ -13,6 +13,8 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
     // 1. Cargar Contactos al montar el componente
     useEffect(() => {
         const fetchContacts = async () => {
+            if (!user || !user.id) return;
+
             try {
                 const response = await axios.get(`${API_URL}/api/auth/users`);
                 const allUsers = response.data;
@@ -75,8 +77,6 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
                 receiverId: selectedContactId,
                 content: messageInput
             });
-            // Aquí podríamos hacer un 'loadMessages' para actualizar el ID real,
-            // pero para esta demo es suficiente.
             console.log("Mensaje enviado");
         } catch (error) {
             console.error("Error enviando mensaje", error);
@@ -87,22 +87,48 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
     return (
         <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
 
-            {/* BARRA LATERAL */}
+            {/* BARRA LATERAL IZQUIERDA (30% aprox) */}
             <div className="w-80 flex flex-col border-r border-slate-700 bg-slate-800">
+
+                {/* HEADER DE LA BARRA LATERAL */}
                 <div className="p-4 border-b border-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold">
                             {user.username.substring(0, 2).toUpperCase()}
                         </div>
-                        <span className="font-semibold">{user.username}</span>
+                        <span className="font-semibold truncate">{user.username}</span>
                     </div>
-                    {/* CAMBIO AQUÍ: */}
-                    <button
-                        onClick={onEditProfile}
-                        className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 text-lg"
-                    >
-                        ⚙️
-                    </button>
+
+                    {/* BOTONES DE ACCIÓN */}
+                    <div className="flex gap-2">
+                        {/* Botón Cerrar Sesión */}
+                        <button
+                            onClick={onLogout}
+                            className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 text-red-400 hover:text-red-300 transition"
+                            title="Cerrar Sesión"
+                        >
+                            🚪
+                        </button>
+
+                        {/* Botón Configuración */}
+                        <button
+                            onClick={onEditProfile}
+                            className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
+                            title="Editar Perfil"
+                        >
+                            ⚙️
+                        </button>
+                    </div>
+                </div>
+
+                {/* Búsqueda (Decorativa por ahora) */}
+                <div className="p-4">
+                    <input
+                        type="text"
+                        placeholder="Buscar o iniciar chat"
+                        className="w-full px-3 py-2 bg-slate-900 text-gray-400 text-sm rounded-md focus:outline-none"
+                        disabled
+                    />
                 </div>
 
                 {/* Lista de Contactos (Real) */}
@@ -115,35 +141,45 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
                                 selectedContactId === contact.id ? 'bg-slate-700 border-l-4 border-blue-500' : ''
                             }`}
                         >
+                            {/* Avatar */}
                             <div className="relative">
                                 <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold">
                                     {contact.username.charAt(0)}
                                 </div>
+                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></span>
                             </div>
 
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-medium truncate">{contact.username}</h4>
-                                <p className="text-sm text-gray-400">Click para ver chat</p>
+                                <p className="text-sm text-gray-400 truncate">Contacto disponible</p>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* VENTANA DE CHAT */}
+            {/* VENTANA DE CHAT (RESTO) */}
             <div className="flex-1 flex flex-col bg-slate-900">
                 {selectedContactId ? (
                     <>
-                        {/* Header */}
-                        <div className="p-4 border-b border-slate-700 bg-slate-800 flex justify-between items-center">
+                        {/* Header del Chat */}
+                        <div className="p-4 border-b border-slate-700 bg-slate-800 flex justify-between items-center shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center font-bold">
-                                    {selectedContactName.charAt(0)}
+                                <div className="relative">
+                                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center font-bold">
+                                        {selectedContactName.charAt(0)}
+                                    </div>
+                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></span>
                                 </div>
                                 <div>
                                     <h2 className="font-bold text-lg">{selectedContactName}</h2>
                                     <span className="text-xs text-green-400">Online</span>
                                 </div>
+                            </div>
+
+                            <div className="flex gap-4 text-gray-400">
+                                <button className="hover:text-white transition">📞</button>
+                                <button className="hover:text-white transition">📹</button>
                             </div>
                         </div>
 
@@ -157,8 +193,8 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
                                 <div key={msg.id} className={`flex ${msg.senderId === user.id ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[70%] px-4 py-2 rounded-lg ${
                                         msg.senderId === user.id
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-slate-700 text-gray-200'
+                                            ? 'bg-blue-600 text-white rounded-tr-none'
+                                            : 'bg-slate-700 text-gray-200 rounded-tl-none'
                                     }`}>
                                         <p>{msg.content}</p>
                                         <div className={`text-[10px] mt-1 text-right ${
@@ -174,6 +210,9 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
                         {/* Input Area */}
                         <div className="p-4 border-t border-slate-700 bg-slate-800">
                             <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                                <button type="button" className="p-2 text-gray-400 hover:text-white transition">
+                                    ➕
+                                </button>
                                 <input
                                     type="text"
                                     value={messageInput}
@@ -181,7 +220,10 @@ const MainChat = ({ user, onLogout, onEditProfile }) => {
                                     placeholder="Type a message..."
                                     className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition">
+                                <button type="button" className="p-2 text-gray-400 hover:text-white transition">
+                                    😊
+                                </button>
+                                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition flex items-center justify-center">
                                     ➤
                                 </button>
                             </form>
