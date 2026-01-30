@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const MainChat = ({ user }) => {
+const MainChat = ({ user, onLogout, onEditProfile }) => {
     const [contacts, setContacts] = useState([]);
     const [selectedContactId, setSelectedContactId] = useState(null);
     const [selectedContactName, setSelectedContactName] = useState("");
@@ -96,6 +96,13 @@ const MainChat = ({ user }) => {
                         </div>
                         <span className="font-semibold">{user.username}</span>
                     </div>
+                    {/* CAMBIO AQUÍ: */}
+                    <button
+                        onClick={onEditProfile}
+                        className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 text-lg"
+                    >
+                        ⚙️
+                    </button>
                 </div>
 
                 {/* Lista de Contactos (Real) */}
