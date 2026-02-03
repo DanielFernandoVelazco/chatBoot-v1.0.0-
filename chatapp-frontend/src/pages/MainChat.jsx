@@ -64,18 +64,27 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             console.log('Conectado al WebSocket');
             stompClientRef.current = client;
 
-            // ... dentro de client.subscribe ...
-            client.subscribe('/user/queue/messages', (message) => {
+            // 3. Suscribirse al Topic Global de mensajes
+            client.subscribe('/topic/messages', (message) => {
                 const newMessage = JSON.parse(message.body);
+                console.log("Mensaje recibido en Topic:", newMessage);
 
-                // CAMBIO CLAVE: Usamos el Ref (.current) para obtener el valor actualizado
-                const activeId = activeContactRef.current;
+                // Leer el ID del chat activo actual (usando Ref para valor fresco)
+                const activeChatId = activeContactRef.current;
 
-                // Solo añadimos si el mensaje pertenece al chat que estamos viendo ahora
-                if (activeId === newMessage.senderId || activeId === newMessage.receiverId) {
+                // Lógica de Filtrado:
+                // Solo mostramos el mensaje si:
+                // 1. Soy el RECEPTOR y estoy viendo al EMISOR
+                // 2. Soy el EMISOR y estoy viendo al RECEPTOR
+                const isForMe =
+                    (newMessage.receiverId === user.id && activeChatId === newMessage.senderId) ||
+                    (newMessage.senderId === user.id && activeChatId === newMessage.receiverId);
+
+                if (isForMe) {
                     setMessages(prev => [...prev, newMessage]);
                 } else {
-                    console.log(`Mensaje recibido para otro chat (Activo: ${activeId}, Msg: ${newMessage.senderId}->${newMessage.receiverId})`);
+                    // Si el mensaje es para mí pero estoy en otro chat, podríamos poner una notificación visual aquí
+                    console.log("Mensaje de otro chat");
                 }
             });
 
