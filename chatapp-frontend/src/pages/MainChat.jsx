@@ -16,6 +16,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const fileInputRef = useRef(null);
     const [activeContactId, setActiveContactId] = useState(null);
     const activeContactRef = useRef(null);
+    const isMountedRef = useRef(false); // AGREGAR ESTO
 
     const API_URL = 'http://localhost:8081';
 
@@ -49,51 +50,53 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         fetchContacts();
     }, [user.id]);
 
-    // 2. CONEXIÓN WEBSOCKET CON LIMPIEZA DE SUSCRIPCIONES
+    // 2. CONEXIÓN WEBSOCKET BLINDADA
     useEffect(() => {
         if (!user || !user.id) return;
 
-        // CORRECCIÓN DE CORS: Desactivar credenciales explícitamente para permitir '*'
         const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
         const client = Stomp.over(socket);
-
-        // Desactivar logs molestos de Stomp en consola
         client.debug = () => {};
 
         let subscription = null;
 
+        isMountedRef.current = true; // Marcamos como "vivo"
+
         client.connect({}, () => {
             console.log('Conectado al WebSocket');
             stompClientRef.current = client;
-            setStompClient(client);
 
-            // 3. Suscribirse al Topic Global de mensajes
+            // 3. Suscribirse
             subscription = client.subscribe('/topic/messages', (message) => {
-                const newMessage = JSON.parse(message.body);
 
-                // LOGS DE DEPURACIÓN (Para verificar)
+                // -----------------------------
+                // DEFENSA PRINCIPAL: ¿Sigo vivo?
+                // Si el componente se desmontó mientras el mensaje llegaba,
+                // cancelamos aquí.
+                // -----------------------------
+                if (!isMountedRef.current) {
+                    console.warn("Componente desmontado. Ignorando mensaje.");
+                    return;
+                }
+
+                const newMessage = JSON.parse(message.body);
                 const activeId = activeContactRef.current;
+
+                // LOGS DE DEPURACIÓN
                 console.log("--- VERIFICANDO MENSAJE ---");
                 console.log("Mensaje:", newMessage);
                 console.log("Mi ID:", user.id);
                 console.log("Chat Activo:", activeId);
-                console.log("Es Receptor?", newMessage.receiverId === user.id, "(Receptor:", newMessage.receiverId, " vs Mi ID:", user.id, ")");
-                console.log("Es Emisor?", newMessage.senderId === user.id, "(Emisor:", newMessage.senderId, " vs Mi ID:", user.id, ")");
 
-                // Lógica de Filtrado:
-                // Solo mostramos el mensaje si:
-                // 1. Soy el RECEPTOR y estoy viendo al EMISOR
-                // 2. Soy el EMISOR y estoy viendo al RECEPTOR
                 const isForMe =
                     (newMessage.receiverId === user.id && activeId === newMessage.senderId) ||
                     (newMessage.senderId === user.id && activeId === newMessage.receiverId);
 
                 if (isForMe) {
                     console.log(">>> RESULTADO: MOSTRAR MENSAJE");
-                    // DEFENSA EXTRA: Si ya existe este ID, no lo agregamos para evitar duplicados de UI
                     setMessages(prev => {
                         if (prev.some(msg => msg.id === newMessage.id)) {
-                            return prev;
+                            return prev; // Evitar duplicados estrictos
                         }
                         return [...prev, newMessage];
                     });
@@ -106,18 +109,100 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             console.error("Error conectando WebSocket", error);
         });
 
-        // Limpieza al desmontar
+        // LIMPIEZA FORZADA
         return () => {
-            // 1. Cancelar la suscripción para que no quede escuchando eventos
+            console.log("Desmontando WebSocket...");
+            isMountedRef.current = false; // Marcamos como "muerto" inmediatamente
+
+            // 1. Cancelar suscripción
             if (subscription) {
                 subscription.unsubscribe();
             }
-            // 2. Desconectar el socket
-            if (client && client.connected) {
-                client.disconnect();
+            // 2. Desconectar socket (Si existe)
+            // Nota: sockjs client es una referencia, no el objeto conectado siempre
+            if (client) {
+                try {
+                    client.disconnect();
+                } catch(e) {}
             }
         };
-    }, [user.id]); // Solo reconectar si cambia el usuario
+    }, [user.id]);  // 2. CONEXIÓN WEBSOCKET BLINDADA
+    useEffect(() => {
+        if (!user || !user.id) return;
+
+        const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
+        const client = Stomp.over(socket);
+        client.debug = () => {};
+
+        let subscription = null;
+
+        isMountedRef.current = true; // Marcamos como "vivo"
+
+        client.connect({}, () => {
+            console.log('Conectado al WebSocket');
+            stompClientRef.current = client;
+
+            // 3. Suscribirse
+            subscription = client.subscribe('/topic/messages', (message) => {
+
+                // -----------------------------
+                // DEFENSA PRINCIPAL: ¿Sigo vivo?
+                // Si el componente se desmontó mientras el mensaje llegaba,
+                // cancelamos aquí.
+                // -----------------------------
+                if (!isMountedRef.current) {
+                    console.warn("Componente desmontado. Ignorando mensaje.");
+                    return;
+                }
+
+                const newMessage = JSON.parse(message.body);
+                const activeId = activeContactRef.current;
+
+                // LOGS DE DEPURACIÓN
+                console.log("--- VERIFICANDO MENSAJE ---");
+                console.log("Mensaje:", newMessage);
+                console.log("Mi ID:", user.id);
+                console.log("Chat Activo:", activeId);
+
+                const isForMe =
+                    (newMessage.receiverId === user.id && activeId === newMessage.senderId) ||
+                    (newMessage.senderId === user.id && activeId === newMessage.receiverId);
+
+                if (isForMe) {
+                    console.log(">>> RESULTADO: MOSTRAR MENSAJE");
+                    setMessages(prev => {
+                        if (prev.some(msg => msg.id === newMessage.id)) {
+                            return prev; // Evitar duplicados estrictos
+                        }
+                        return [...prev, newMessage];
+                    });
+                } else {
+                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
+                }
+            });
+
+        }, (error) => {
+            console.error("Error conectando WebSocket", error);
+        });
+
+        // LIMPIEZA FORZADA
+        return () => {
+            console.log("Desmontando WebSocket...");
+            isMountedRef.current = false; // Marcamos como "muerto" inmediatamente
+
+            // 1. Cancelar suscripción
+            if (subscription) {
+                subscription.unsubscribe();
+            }
+            // 2. Desconectar socket (Si existe)
+            // Nota: sockjs client es una referencia, no el objeto conectado siempre
+            if (client) {
+                try {
+                    client.disconnect();
+                } catch(e) {}
+            }
+        };
+    }, [user.id]);
 
     // 2. Función para seleccionar un contacto y cargar su chat
     const selectContact = (contact) => {
