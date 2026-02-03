@@ -128,9 +128,18 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
 
     // 2. Función para seleccionar un contacto y cargar su chat
     const selectContact = (contact) => {
-        setSelectedContactId(contact.id);
+        const contactId = contact.id;
+
+        // ---------------------------------------------------
+        // SOLUCIÓN CRÍTICA: Forzar actualización del Ref aquí.
+        // Aseguramos que el WebSocket sepa el contacto activo INMEDIATAMENTE,
+        // en lugar de esperar al ciclo de renderizado de React (useEffect).
+        // ---------------------------------------------------
+        activeContactRef.current = contactId;
+
+        setSelectedContactId(contactId);
         setSelectedContactName(contact.username);
-        loadMessages(user.id, contact.id);
+        loadMessages(user.id, contactId);
     };
 
     // 3. Cargar mensajes de la conversación
