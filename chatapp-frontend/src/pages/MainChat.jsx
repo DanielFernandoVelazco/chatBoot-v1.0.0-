@@ -67,24 +67,25 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             // 3. Suscribirse al Topic Global de mensajes
             client.subscribe('/topic/messages', (message) => {
                 const newMessage = JSON.parse(message.body);
-                console.log("Mensaje recibido en Topic:", newMessage);
+                const activeId = activeContactRef.current;
 
-                // Leer el ID del chat activo actual (usando Ref para valor fresco)
-                const activeChatId = activeContactRef.current;
+                // LOG DE DEPURACIÓN: Imprimimos qué estamos comparando
+                console.log("--- VERIFICANDO MENSAJE ---");
+                console.log("Mensaje:", newMessage);
+                console.log("Mi ID:", user.id);
+                console.log("Chat Activo:", activeId);
+                console.log("Es Receptor?", newMessage.receiverId === user.id, " (Mensaje Receptor:", newMessage.receiverId, " vs Mi ID:", user.id, ")");
+                console.log("Es Emisor?", newMessage.senderId === user.id, " (Mensaje Emisor:", newMessage.senderId, " vs Mi ID:", user.id, ")");
 
-                // Lógica de Filtrado:
-                // Solo mostramos el mensaje si:
-                // 1. Soy el RECEPTOR y estoy viendo al EMISOR
-                // 2. Soy el EMISOR y estoy viendo al RECEPTOR
                 const isForMe =
-                    (newMessage.receiverId === user.id && activeChatId === newMessage.senderId) ||
-                    (newMessage.senderId === user.id && activeChatId === newMessage.receiverId);
+                    (newMessage.receiverId === user.id && activeId === newMessage.senderId) ||
+                    (newMessage.senderId === user.id && activeId === newMessage.receiverId);
 
                 if (isForMe) {
+                    console.log(">>> RESULTADO: MOSTRAR MENSAJE");
                     setMessages(prev => [...prev, newMessage]);
                 } else {
-                    // Si el mensaje es para mí pero estoy en otro chat, podríamos poner una notificación visual aquí
-                    console.log("Mensaje de otro chat");
+                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
                 }
             });
 
