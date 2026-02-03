@@ -42,25 +42,15 @@ public class MessageServiceImpl implements MessageService {
         // 3. Guardar en DB
         Message savedMessage = messageRepository.save(message);
 
-        // 4. Convertir a DTO para enviar por WS
+        // 4. Convertir a DTO
         MessageResponseDto responseDto = mapToResponseDto(savedMessage);
 
-        // 5. Enviar por WebSocket al RECEPTOR
-        // La ruta es /user/{userId}/queue/messages
-        messagingTemplate.convertAndSendToUser(
-                requestDto.getReceiverId().toString(),
-                "/queue/messages",
-                responseDto
-        );
+        // 5. ENVIAR POR WEBSOCKET (NUEVA LÓGICA)
+        // En lugar de enviar a un usuario específico, enviamos a un Topic global.
+        // Todos los clientes conectados lo recibirán.
+        messagingTemplate.convertAndSend("/topic/messages", responseDto);
 
-        // 6. Enviar por WebSocket al EMISOR (para confirmación/instantaneidad)
-        messagingTemplate.convertAndSendToUser(
-                requestDto.getSenderId().toString(),
-                "/queue/messages",
-                responseDto
-        );
-
-        // 7. Retornar respuesta HTTP (para la petición original)
+        // 6. Retornar respuesta HTTP
         return responseDto;
     }
 
