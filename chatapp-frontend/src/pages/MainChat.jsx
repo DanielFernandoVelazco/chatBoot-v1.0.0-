@@ -12,36 +12,62 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const [messageInput, setMessageInput] = useState("");
 
     // NUEVOS ESTADOS
+
+    const [stompClient, setStompClient] = useState(null);
+    const stompClientRef = useRef(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const fileInputRef = useRef(null); // Referencia al input de archivos oculto
+    const fileInputRef = useRef(null);
 
     const API_URL = 'http://localhost:8081';
 
-    const [stompClient, setStompClient] = useState(null);
+    // 1. Cargar Contactos al montar el componente
+    useEffect(() => {
+        const fetchContacts = async () => {
+            if (!user || !user.id) return;
 
-    // CONEXIÓN WEBSOCKET
+            try {
+                const response = await axios.get(`${API_URL}/api/auth/users`);
+                const allUsers = response.data;
+
+                // Filtramos para no mostrarnos a nosotros mismos en la lista
+                const otherUsers = allUsers.filter(u => u.id !== user.id);
+                setContacts(otherUsers);
+
+                // Seleccionar automáticamente el primer contacto si existe
+                if (otherUsers.length > 0) {
+                    selectContact(otherUsers[0]);
+                }
+            } catch (error) {
+                console.error("Error cargando contactos", error);
+            }
+        };
+
+        fetchContacts();
+    }, [user.id]);
+
+    // 2. CONEXIÓN WEBSOCKET CORREGIDA
     useEffect(() => {
         if (!user || !user.id) return;
 
-        // 1. Crear conexión Socket
-        const socket = new SockJS('http://localhost:8081/ws-chat');
+        // CORRECCIÓN DE CORS: Desactivar credenciales explícitamente para permitir '*'
+        const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
         const client = Stomp.over(socket);
 
-        // 2. Conectar
+        // Desactivar logs molestos de Stomp en consola
+        client.debug = () => {};
+
         client.connect({}, () => {
             console.log('Conectado al WebSocket');
-            setStompClient(client);
+            stompClientRef.current = client;
 
-            // 3. Suscribirse a mi cola personal de mensajes
-            // Cuando llegue algo a /user/{miId}/queue/messages, se ejecuta esta función
+            // Suscribirse a mi cola personal de mensajes
             client.subscribe('/user/queue/messages', (message) => {
                 const newMessage = JSON.parse(message.body);
 
-                // Verificar si el mensaje pertenece al chat actual que estoy viendo
+                // Verificar si el mensaje pertenece al chat actual
                 if (selectedContactId === newMessage.senderId || selectedContactId === newMessage.receiverId) {
                     setMessages(prev => [...prev, newMessage]);
                 } else {
-                    // Si estoy en otro chat, aquí podríamos poner un sonido o notificación visual
                     console.log("Nuevo mensaje recibido en otro chat");
                 }
             });
@@ -50,13 +76,14 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             console.error("Error conectando WebSocket", error);
         });
 
-        // 4. Limpieza al desmontar
+        // Limpieza al desmontar
         return () => {
-            if (client) {
+            // CORRECCIÓN: Verificar que el cliente esté conectado antes de desconectar
+            if (client && client.connected) {
                 client.disconnect();
             }
         };
-    }, [user.id, selectedContactId]);
+    }, [user.id]); // Solo reconectar si cambia el usuario
 
     // 1. Cargar Contactos al montar el componente
     useEffect(() => {
