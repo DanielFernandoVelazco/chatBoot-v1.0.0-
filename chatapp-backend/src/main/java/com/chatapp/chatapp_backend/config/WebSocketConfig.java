@@ -22,7 +22,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // El endpoint donde se conectarán los clientes
-        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();
+        // CAMBIO: Origen explícito y permitir credenciales
+        registry.addEndpoint("/ws-chat")
+                .setAllowedOrigins("http://localhost:5173")
+                .withSockJS();
     }
 }
