@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -20,6 +21,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Override
     public MessageResponseDto sendMessage(MessageRequestDto requestDto) {
@@ -35,11 +39,29 @@ public class MessageServiceImpl implements MessageService {
         message.setReceiver(receiver);
         message.setContent(requestDto.getContent());
 
-        // 3. Guardar
+        // 3. Guardar en DB
         Message savedMessage = messageRepository.save(message);
 
-        // 4. Mapear y retornar
-        return mapToResponseDto(savedMessage);
+        // 4. Convertir a DTO para enviar por WS
+        MessageResponseDto responseDto = mapToResponseDto(savedMessage);
+
+        // 5. Enviar por WebSocket al RECEPTOR
+        // La ruta es /user/{userId}/queue/messages
+        messagingTemplate.convertAndSendToUser(
+                requestDto.getReceiverId().toString(),
+                "/queue/messages",
+                responseDto
+        );
+
+        // 6. Enviar por WebSocket al EMISOR (para confirmación/instantaneidad)
+        messagingTemplate.convertAndSendToUser(
+                requestDto.getSenderId().toString(),
+                "/queue/messages",
+                responseDto
+        );
+
+        // 7. Retornar respuesta HTTP (para la petición original)
+        return responseDto;
     }
 
     @Override
