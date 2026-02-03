@@ -64,7 +64,11 @@ public class MessageServiceImpl implements MessageService {
         MessageResponseDto dto = new MessageResponseDto();
         dto.setId(message.getId());
         dto.setSenderId(message.getSender().getId());
-        dto.setSenderName(message.getSender().getUsername()); // AGREGAR ESTA LÍNEA
+        dto.setSenderName(message.getSender().getUsername());
+
+        // AGREGAR ESTA LÍNEA:
+        dto.setReceiverId(message.getReceiver().getId());
+
         dto.setContent(message.getContent());
         dto.setTimestamp(message.getTimestamp());
         return dto;
