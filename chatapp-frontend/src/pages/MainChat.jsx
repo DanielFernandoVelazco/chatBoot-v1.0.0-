@@ -6,19 +6,23 @@ import Stomp from "stompjs";
 const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) => {
 
     const [contacts, setContacts] = useState([]);
-    const [selectedContactId, setSelectedContactId] = useState(null);
     const [selectedContactName, setSelectedContactName] = useState("");
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState("");
-
-    // NUEVOS ESTADOS
-
     const [stompClient, setStompClient] = useState(null);
     const stompClientRef = useRef(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const fileInputRef = useRef(null);
+    const [selectedContactId, setSelectedContactId] = useState(null);
+
+    const activeContactRef = useRef(null);
 
     const API_URL = 'http://localhost:8081';
+
+    // Sincronizar el Ref con el Estado
+    useEffect(() => {
+        activeContactRef.current = selectedContactId;
+    }, [selectedContactId]);
 
     // 1. Cargar Contactos al montar el componente
     useEffect(() => {
@@ -60,15 +64,18 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             console.log('Conectado al WebSocket');
             stompClientRef.current = client;
 
-            // Suscribirse a mi cola personal de mensajes
+            // ... dentro de client.subscribe ...
             client.subscribe('/user/queue/messages', (message) => {
                 const newMessage = JSON.parse(message.body);
 
-                // Verificar si el mensaje pertenece al chat actual
-                if (selectedContactId === newMessage.senderId || selectedContactId === newMessage.receiverId) {
+                // CAMBIO CLAVE: Usamos el Ref (.current) para obtener el valor actualizado
+                const activeId = activeContactRef.current;
+
+                // Solo añadimos si el mensaje pertenece al chat que estamos viendo ahora
+                if (activeId === newMessage.senderId || activeId === newMessage.receiverId) {
                     setMessages(prev => [...prev, newMessage]);
                 } else {
-                    console.log("Nuevo mensaje recibido en otro chat");
+                    console.log(`Mensaje recibido para otro chat (Activo: ${activeId}, Msg: ${newMessage.senderId}->${newMessage.receiverId})`);
                 }
             });
 
