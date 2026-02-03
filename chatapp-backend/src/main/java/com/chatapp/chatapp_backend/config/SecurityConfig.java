@@ -46,7 +46,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // En producción, poner la URL de React
+        // CAMBIO: Usar origen explícito en lugar de *
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+
+        // IMPORTANTE: Habilitar credenciales explícitamente
+        configuration.setAllowCredentials(true);
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 
