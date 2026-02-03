@@ -26,10 +26,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
-                        // PERMITE TODO lo que esté en /api/auth/ (registro, login, lista de usuarios, etc)
+                        // PERMITE Auth y Mensajes
                         .requestMatchers("/api/auth/**").permitAll()
-                        // PERMITE todo lo que esté en /api/messages/ (enviar mensajes, historial)
                         .requestMatchers("/api/messages/**").permitAll()
+
+                        // PERMITE WEBSOCKET (AGREGAR ESTO)
+                        .requestMatchers("/ws-chat/**").permitAll()
+
                         // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 );
