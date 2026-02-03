@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'; // Agregar useRef
 import axios from 'axios';
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
 
 const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) => {
 
@@ -14,6 +16,47 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const fileInputRef = useRef(null); // Referencia al input de archivos oculto
 
     const API_URL = 'http://localhost:8081';
+
+    const [stompClient, setStompClient] = useState(null);
+
+    // CONEXIÓN WEBSOCKET
+    useEffect(() => {
+        if (!user || !user.id) return;
+
+        // 1. Crear conexión Socket
+        const socket = new SockJS('http://localhost:8081/ws-chat');
+        const client = Stomp.over(socket);
+
+        // 2. Conectar
+        client.connect({}, () => {
+            console.log('Conectado al WebSocket');
+            setStompClient(client);
+
+            // 3. Suscribirse a mi cola personal de mensajes
+            // Cuando llegue algo a /user/{miId}/queue/messages, se ejecuta esta función
+            client.subscribe('/user/queue/messages', (message) => {
+                const newMessage = JSON.parse(message.body);
+
+                // Verificar si el mensaje pertenece al chat actual que estoy viendo
+                if (selectedContactId === newMessage.senderId || selectedContactId === newMessage.receiverId) {
+                    setMessages(prev => [...prev, newMessage]);
+                } else {
+                    // Si estoy en otro chat, aquí podríamos poner un sonido o notificación visual
+                    console.log("Nuevo mensaje recibido en otro chat");
+                }
+            });
+
+        }, (error) => {
+            console.error("Error conectando WebSocket", error);
+        });
+
+        // 4. Limpieza al desmontar
+        return () => {
+            if (client) {
+                client.disconnect();
+            }
+        };
+    }, [user.id, selectedContactId]);
 
     // 1. Cargar Contactos al montar el componente
     useEffect(() => {
