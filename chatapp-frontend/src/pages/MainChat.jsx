@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Agregar useRef
 import axios from 'axios';
 
 const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) => {
+
     const [contacts, setContacts] = useState([]);
     const [selectedContactId, setSelectedContactId] = useState(null);
     const [selectedContactName, setSelectedContactName] = useState("");
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState("");
+
+    // NUEVOS ESTADOS
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const fileInputRef = useRef(null); // Referencia al input de archivos oculto
 
     const API_URL = 'http://localhost:8081';
 
@@ -81,6 +86,57 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         } catch (error) {
             console.error("Error enviando mensaje", error);
             // Si falla, podríamos quitar el mensaje optimista
+        }
+    }
+
+    // NUEVA FUNCIÓN: Manejar selección de Emoji
+    const handleEmojiClick = (emoji) => {
+        setMessageInput((prev) => prev + emoji);
+        setShowEmojiPicker(false); // Cerrar el picker al seleccionar
+    };
+
+    // NUEVA FUNCIÓN: Manejar subida de imagen (Base64)
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                // reader.result contiene la imagen en formato Base64 (data:image/png;base64,...)
+                sendMessageImage(reader.result);
+            };
+            reader.onerror = () => {
+                alert('Error al leer la imagen');
+            };
+        }
+    };
+
+    // FUNCIÓN AUXILIAR: Enviar Mensaje (Reutilizada para Texto e Imagen)
+    const sendMessageImage = async (content) => {
+        if (!selectedContactId) return;
+
+        const tempId = Date.now();
+
+        // Si es imagen, mostramos una miniatura, si es texto, el texto
+        const newMessage = {
+            id: tempId,
+            senderId: user.id,
+            content: content,
+            timestamp: new Date().toISOString()
+        };
+
+        setMessages([...messages, newMessage]);
+        setMessageInput("");
+
+        try {
+            await axios.post(`${API_URL}/api/messages/send`, {
+                senderId: user.id,
+                receiverId: selectedContactId,
+                content: content
+            });
+            console.log("Mensaje enviado");
+        } catch (error) {
+            console.error("Error enviando mensaje", error);
         }
     };
 
@@ -200,12 +256,19 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
 
                             {messages.map(msg => (
                                 <div key={msg.id} className={`flex ${msg.senderId === user.id ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[70%] px-4 py-2 rounded-lg ${
+                                    <div className={`max-w-[70%] px-2 py-2 rounded-lg ${
                                         msg.senderId === user.id
                                             ? 'bg-blue-600 text-white rounded-tr-none'
                                             : 'bg-slate-700 text-gray-200 rounded-tl-none'
                                     }`}>
-                                        <p>{msg.content}</p>
+
+                                        {/* DETECTAR SI ES IMAGEN O TEXTO */}
+                                        {msg.content.startsWith('data:image') ? (
+                                            <img src={msg.content} alt="Imagen" className="rounded max-w-full h-auto" />
+                                        ) : (
+                                            <p>{msg.content}</p>
+                                        )}
+
                                         <div className={`text-[10px] mt-1 text-right ${
                                             msg.senderId === user.id ? 'text-blue-200' : 'text-gray-500'
                                         }`}>
@@ -217,11 +280,45 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 border-t border-slate-700 bg-slate-800">
-                            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                                <button type="button" className="p-2 text-gray-400 hover:text-white transition">
+                        <div className="p-4 border-t border-slate-700 bg-slate-800 relative">
+
+                            {/* INPUT DE ARCHIVO OCULTO */}
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+
+                            {/* PICKER DE EMOJIS (Condicionado al estado) */}
+                            {showEmojiPicker && (
+                                <div className="absolute bottom-16 left-4 bg-slate-700 p-3 rounded-lg shadow-xl border border-slate-600 z-50">
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {['😀','😂','😍','🥺','😎','🤔','👍','👎','❤️','🔥','🎉','🚀','👻','💩','👋','🙏','👀','💪','🧠','🔨'].map((emoji, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleEmojiClick(emoji)}
+                                                className="text-2xl hover:scale-125 transition"
+                                            >
+                                                {emoji}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <form onSubmit={(e) => { e.preventDefault(); sendMessageImage(messageInput); }} className="flex items-center gap-2">
+
+                                {/* BOTÓN + (Cargar Imagen) */}
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current.click()}
+                                    className="p-2 text-gray-400 hover:text-white transition relative"
+                                >
                                     ➕
                                 </button>
+
                                 <input
                                     type="text"
                                     value={messageInput}
@@ -229,9 +326,17 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                     placeholder="Type a message..."
                                     className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <button type="button" className="p-2 text-gray-400 hover:text-white transition">
+
+                                {/* BOTÓN CARA FELIZ (Emojis) */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    className="p-2 text-gray-400 hover:text-white transition relative"
+                                >
                                     😊
+                                    {showEmojiPicker && <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>}
                                 </button>
+
                                 <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition flex items-center justify-center">
                                     ➤
                                 </button>
