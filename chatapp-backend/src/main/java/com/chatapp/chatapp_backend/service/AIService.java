@@ -1,6 +1,7 @@
 package com.chatapp.chatapp_backend.service;
 
 import com.chatapp.chatapp_backend.config.AIConfig;
+import com.chatapp.chatapp_backend.dto.AIMessageDto; // Importar nueva clase
 import com.chatapp.chatapp_backend.dto.AIRequestDto;
 import com.chatapp.chatapp_backend.dto.AIResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AIService {
@@ -23,41 +22,27 @@ public class AIService {
 
     public String generateResponse(String userMessage, String conversationHistoryJson) {
         try {
-            // 1. Construir la URL completa del endpoint
             String url = aiConfig.getProviderUrl() + "/chat/completions";
 
-            // 2. Construir los headers (Autorización Bearer Token)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(aiConfig.getApiKey());
 
-            // 3. Construir el cuerpo de la petición (Formato OpenAI Genérico)
-            // Aquí implementamos la "Característica Propietaria": Memoria de Contexto
-
-            // Mensaje del sistema (Persona)
-            AIRequestDto.Message systemMsg = new AIRequestDto.Message();
+            // Construir mensajes con la nueva clase
+            AIMessageDto systemMsg = new AIMessageDto();
             systemMsg.setRole("system");
             systemMsg.setContent(aiConfig.getSystemPrompt());
 
-            // Mensaje del usuario (Lo que acabas de escribir)
-            AIRequestDto.Message userMsg = new AIRequestDto.Message();
+            AIMessageDto userMsg = new AIMessageDto();
             userMsg.setRole("user");
             userMsg.setContent(userMessage);
 
-            // Historial pasado (Si no lo hay, solo el sistema y el usuario)
-            List<AIRequestDto.Message> messagesList = new ArrayList<>();
+            List<AIMessageDto> messagesList = new ArrayList<>();
             messagesList.add(systemMsg);
             messagesList.add(userMsg);
 
-            // NOTA: En un caso real, decodificaríamos el JSON de historial
-            // y añadiríamos esos mensajes aquí para tener memoria a largo plazo.
-            // Por simplicidad en este paso, enviamos solo el mensaje actual + sistema.
+            AIRequestDto request = new AIRequestDto(aiConfig.getModelName(), messagesList);
 
-            AIRequestDto request = new AIRequestDto();
-            request.setModel(aiConfig.getModelName());
-            request.setMessages(messagesList);
-
-            // 4. Hacer la petición
             HttpEntity<AIRequestDto> entity = new HttpEntity<>(request, headers);
             ResponseEntity<AIResponseDto> response = restTemplate.exchange(
                     url,
@@ -66,7 +51,6 @@ public class AIService {
                     AIResponseDto.class
             );
 
-            // 5. Extraer la respuesta
             if (response.getBody() != null && !response.getBody().getChoices().isEmpty()) {
                 return response.getBody().getChoices().get(0).getMessage().getContent();
             } else {
