@@ -16,6 +16,7 @@ public class UserResponseDto {
     private String email;
     private String profilePhotoUrl;
     private String bio;
+    private String content;
     private Boolean online;
     private LocalDateTime createdAt;
     private Boolean notificationsEnabled;
