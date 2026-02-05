@@ -16,14 +16,22 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
 
     // Refs
     const fileInputRef = useRef(null);
-    const activeContactRef = useRef(null); // Usado solo para WebSocket
+    const activeContactRef = useRef(null);
     const stompClientRef = useRef(null);
     const stompConnectedRef = useRef(false);
     const isMountedRef = useRef(false);
 
+    // Nuevo estado para el Modo IA
+    const [chatMode, setChatMode] = useState('human'); // 'human' o 'ai'
+
     const API_URL = 'http://localhost:8081';
 
-    // 1. Cargar Contactos
+    // Sincronizar el Ref con el Estado
+    useEffect(() => {
+        activeContactRef.current = selectedContactId;
+    }, [selectedContactId]);
+
+    // Cargar Contactos
     useEffect(() => {
         const fetchContacts = async () => {
             if (!user || !user.id) return;
@@ -42,7 +50,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         fetchContacts();
     }, [user.id]);
 
-    // 2. CONEXIÓN WEBSOCKET (Simplificada)
+    // CONEXIÓN WEBSOCKET (Versión Blindada)
     useEffect(() => {
         if (!user || !user.id) return;
 
@@ -54,7 +62,6 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
         const client = Stomp.over(socket);
         client.debug = () => {};
-
         let subscription = null;
 
         isMountedRef.current = true;
@@ -64,10 +71,10 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             stompClientRef.current = client;
             stompConnectedRef.current = true;
 
-            // SUSCRIPCIÓN
+            // Suscribirse
             subscription = client.subscribe('/topic/messages', (message) => {
                 if (!isMountedRef.current) {
-                    console.warn("Componente desmontado. Ignorando.");
+                    console.warn("Componente desmontado. Ignorando mensaje.");
                     return;
                 }
 
@@ -86,37 +93,42 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         }
                         return [...prev, newMessage];
                     });
+                } else {
+                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
                 }
             });
+
         }, (error) => {
             console.error("Error conectando WebSocket", error);
+            isConnectingRef.current = false;
             stompConnectedRef.current = false;
         });
 
+        // Limpieza Forzada
         return () => {
             console.log("Desmontando WebSocket...");
             isMountedRef.current = false;
-            stompConnectedRef.current = false;
             if (subscription) {
                 subscription.unsubscribe();
             }
             if (client && client.connected) {
+                stompConnectedRef.current = false;
                 try { client.disconnect(); } catch(e){}
             }
             stompClientRef.current = null;
         };
     }, [user.id]);
 
-    // 3. Seleccionar Contacto
+    // Función para seleccionar un contacto y cargar su chat
     const selectContact = (contact) => {
         const contactId = contact.id;
-        activeContactRef.current = contactId; // Actualizamos Ref inmediatamente
+        activeContactRef.current = contactId;
         setSelectedContactId(contactId);
         setSelectedContactName(contact.username);
         loadMessages(user.id, contactId);
     };
 
-    // 4. Cargar mensajes
+    // Cargar mensajes de la conversación
     const loadMessages = async (id1, id2) => {
         try {
             const response = await axios.get(`${API_URL}/api/messages/conversation`, {
@@ -128,40 +140,68 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         }
     };
 
-    // 5. Enviar Mensaje
+    // Enviar Mensaje
     const handleSendMessage = async (e) => {
         e.preventDefault();
         sendMessageImage(messageInput);
     };
 
+    // Lógica de Envío (Texto o Imagen)
     const sendMessageImage = async (content) => {
+        // Verificar tipo de contenido (Texto vs Imagen) para validaciones específicas
         if (!content || content === "") return;
         if (typeof content === 'string' && !content.trim()) return;
+
         if (!activeContactRef.current) return;
 
         const tempId = Date.now();
-        const newMessage = {
-            id: tempId,
-            senderId: user.id,
-            content: content,
-            timestamp: new Date().toISOString()
-        };
 
-        setMessages(prev => [...prev, newMessage]);
-        setMessageInput("");
+        // Lógica de Enrutamiento (IA vs Humano)
+        if (chatMode === 'ai') {
+            try {
+                const response = await axios.post(`${API_URL}/api/ai/chat`, {
+                    message: content
+                });
 
-        try {
-            await axios.post(`${API_URL}/api/messages/send`, {
-                senderId: user.id,
-                receiverId: activeContactRef.current,
-                content: content
-            });
-            console.log("Mensaje enviado");
-        } catch (error) {
-            console.error("Error enviando mensaje", error);
+                const aiMessage = {
+                    id: tempId,
+                    senderId: -1, // ID fijo para IA
+                    content: response.data.content,
+                    timestamp: new Date().toISOString()
+                };
+
+                setMessages(prev => [...prev, aiMessage]);
+                setMessageInput("");
+                console.log("Mensaje enviado a IA");
+            } catch (error) {
+                console.error("Error enviando mensaje a IA", error);
+                alert("Error de IA: " + error.response?.data?.error || error.message);
+            }
+        } else {
+            // MODO HUMANO (Backend de Mensajes)
+            try {
+                const newMessage = {
+                    id: tempId,
+                    senderId: user.id,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                };
+                setMessages(prev => [...prev, newMessage]);
+                setMessageInput("");
+
+                await axios.post(`${API_URL}/api/messages/send`, {
+                    senderId: user.id,
+                    receiverId: activeContactRef.current,
+                    content: content
+                });
+                console.log("Mensaje enviado al Backend (Humano)");
+            } catch (error) {
+                console.error("Error enviando mensaje (Humano)", error);
+            }
         }
     };
 
+    // Manejo de Emojis
     const handleEmojiClick = (emoji) => {
         setMessageInput((prev) => prev + emoji);
         setShowEmojiPicker(false);
@@ -187,7 +227,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             {/* BARRA LATERAL */}
             <div className="w-80 flex flex-col border-r border-slate-700 bg-slate-800">
 
-                {/* HEADER */}
+                {/* HEADER DE LA BARRA LATERAL */}
                 <div className="p-4 border-b border-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold">
@@ -227,14 +267,14 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                     />
                 </div>
 
-                {/* CONTACTOS */}
+                {/* LISTA DE CONTACTOS */}
                 <div className="flex-1 overflow-y-auto">
                     {contacts.map(contact => (
                         <div
                             key={contact.id}
                             onClick={() => selectContact(contact)}
                             className={`p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-700 transition ${
-                                activeContactRef.current === contact.id ? 'bg-slate-700 border-l-4 border-blue-500' : ''
+                                activeContactId === contact.id ? 'bg-slate-700 border-l-4 border-blue-500' : ''
                             }`}
                         >
                             <div className="relative">
@@ -257,7 +297,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
             <div className="flex-1 flex flex-col bg-slate-900">
                 {selectedContactId ? (
                     <>
-                        {/* HEADER */}
+                        {/* HEADER CHAT */}
                         <div className="p-4 border-b border-slate-700 bg-slate-800 flex justify-between items-center shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="relative">
@@ -292,6 +332,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                             : 'bg-slate-700 text-gray-200 rounded-tl-none'
                                     }`}>
 
+                                        {/* DETECTAR SI ES IMAGEN O TEXTO */}
                                         {msg.content.startsWith('data:image') ? (
                                             <img src={msg.content} alt="Imagen" className="rounded max-w-full h-auto" />
                                         ) : (
@@ -335,10 +376,12 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                             )}
 
                             <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+
+                                {/* BOTÓN + (Cargar Imagen) */}
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current.click()}
-                                    className="p-2 text-gray-400 hover:text-white transition"
+                                    className="p-2 text-gray-400 hover:text-white transition relative"
                                 >
                                     ➕
                                 </button>
@@ -351,6 +394,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                     className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
 
+                                {/* BOTÓN CARA FELIZ (Emojis) */}
                                 <button
                                     type="button"
                                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -358,6 +402,21 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                 >
                                     😊
                                     {showEmojiPicker && <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>}
+                                </button>
+
+                                {/* BOTÓN IA (MODO IA) */}
+                                <button
+                                    type="button"
+                                    onClick={() => setChatMode(prev => prev === 'human' ? 'ai' : 'human')}
+                                    title="Alternar Modo IA"
+                                    className={`p-2 rounded-lg transition ${
+                                        chatMode === 'ai'
+                                            ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                                            : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                                    }`}
+                                >
+                                    🤖
+                                    {chatMode === 'ai' && <span className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></span>}
                                 </button>
 
                                 <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition flex items-center justify-center">
