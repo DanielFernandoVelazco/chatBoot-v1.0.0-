@@ -15,115 +15,28 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [chatMode, setChatMode] = useState('human'); // 'human' o 'ai'
 
-    // --- REFS ---
+    // --- REFs ---
     const fileInputRef = useRef(null);
     const activeContactRef = useRef(null);
     const stompClientRef = useRef(null);
     const stompConnectedRef = useRef(false);
     const isMountedRef = useRef(false);
+    const isConnectingRef = useRef(false); // AÑADIDO: variable faltante
 
     const API_URL = 'http://localhost:8081';
 
-    // --- EFECTOS ---
+    // --- FUNCIONES DE LÓGICA DEL CHAT (FUERA DE LOS EFFECTS) ---
 
-    // 1. Sincronizar Ref
-    useEffect(() => {
-        activeContactRef.current = selectedContactId;
-    }, [selectedContactId]);
-
-    // 2. Cargar Contactos
-    useEffect(() => {
-        const fetchContacts = async () => {
-            if (!user || !user.id) return;
-
-            try {
-                const response = await axios.get(`${API_URL}/api/auth/users`);
-                const allUsers = response.data;
-                const otherUsers = allUsers.filter(u => u.id !== user.id);
-                setContacts(otherUsers);
-
-                if (otherUsers.length > 0) {
-                    selectContact(otherUsers[0]);
-                }
-            } catch (error) {
-                console.error("Error cargando contactos", error);
-            }
-        };
-        fetchContacts();
-    }, [user.id]);
-
-    // 3. Conexión WebSocket
-    useEffect(() => {
-        if (!user || !user.id) return;
-
-        if (stompClientRef.current && stompConnectedRef.current) {
-            console.log("Ya hay un WebSocket activo. Ignorando reconexión.");
-            return;
-        }
-
-        console.log("Iniciando conexión WebSocket...");
-        const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
-        const client = Stomp.over(socket);
-        client.debug = () => {};
-
-        let subscription = null;
-        isMountedRef.current = true;
-
-        client.connect({}, () => {
-            console.log('Conectado al WebSocket');
-            stompClientRef.current = client;
-            stompConnectedRef.current = true;
-
-            // Suscribirse
-            subscription = client.subscribe('/topic/messages', (message) => {
-
-                // 1. ¿Sigo vivo?
-                if (!isMountedRef.current) {
-                    console.warn("Componente desmontado. Ignorando mensaje.");
-                    return;
-                }
-
-                const newMessage = JSON.parse(message.body);
-                const activeId = activeContactRef.current;
-
-                const isForMe =
-                    (newMessage.receiverId === user.id && activeId === newMessage.senderId) ||
-                    (newMessage.senderId === user.id && activeId === newMessage.receiverId);
-
-                if (isForMe) {
-                    console.log(">>> RESULTADO: MOSTRAR MENSAJE");
-                    setMessages(prev => {
-                        if (prev.some(msg => msg.id === newMessage.id)) {
-                            return prev; // Evitar duplicados estrictos de UI
-                        }
-                        return [...prev, newMessage];
-                    });
-                } else {
-                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
-                }
+    const loadMessages = async (id1, id2) => {
+        try {
+            const response = await axios.get(`${API_URL}/api/messages/conversation`, {
+                params: { userId1: id1, userId2: id2 }
             });
-
-        }, (error) => {
-            console.error("Error conectando WebSocket", error);
-            stompConnectedRef.current = false;
-        });
-
-        return () => {
-            console.log("Desmontando WebSocket...");
-            isMountedRef.current = false;
-            stompConnectedRef.current = false;
-
-            if (subscription) {
-                subscription.unsubscribe();
-            }
-            if (client && client.connected) {
-                try { client.disconnect(); } catch(e){}
-            }
-            stompClientRef.current = null;
-        };
-    }, [user.id]);
-
-    // --- FUNCIONES ---
+            setMessages(response.data);
+        } catch (error) {
+            console.error("Error cargando mensajes", error);
+        }
+    };
 
     const selectContact = (contact) => {
         const contactId = contact.id;
@@ -133,52 +46,66 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         loadMessages(user.id, contactId);
     };
 
-    const loadMessages = async (id1, id2) => {
-        try {
-            const response = await axios.get(`${API_URL}/api/messages/conversation`, {
-                params: { userId1: id1, userId2: }
-            });
-            setMessages(response.data);
-        } catch (error) {
-            console.error("Error cargando mensajes", error);
-        }
-    };
-
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        sendMessageImage(messageInput); // Llamamos a la lógica unificada
-    };
-
     const sendMessageImage = async (content) => {
-        // Validar inputs vacíos
+        // Validaciones básicas
         if (!content || content === "") return;
         if (typeof content === 'string' && !content.trim()) return;
+
         if (!activeContactRef.current) return;
 
-        const tempId = Date.now();
+        // ---------------------------------------------------------
+        // LÓGICA DE ENVÍO: HUMANO vs IA
+        // ---------------------------------------------------------
+        if (chatMode === 'ai') {
+            // MODO IA: Enviar a la IA para obtener respuesta
+            try {
+                console.log("--- MODO IA ACTIVO ---");
+                const response = await axios.post(`${API_URL}/api/ai/chat`, {
+                    message: content
+                });
 
-        const newMessage = {
-            id: tempId,
-            senderId: user.id,
-            content: content,
-            timestamp: new Date().toISOString()
-        };
+                const aiMessage = {
+                    id: -1,
+                    senderId: -1,
+                    content: response.data,
+                    timestamp: new Date().toISOString()
+                };
+                setMessages(prev => [...prev, aiMessage]);
+                setMessageInput("");
+                console.log("Mensaje enviado a IA");
+            } catch (error) {
+                console.error("Error en la IA:", error);
+                alert("Error de IA: " + (error.response?.data?.error || error.message || "Verifica tu API Key y URL en application.yaml"));
+            }
+        } else {
+            // MODO HUMANO: Enviar a la base de datos directamente
+            try {
+                const tempId = Date.now();
 
-        // 1. Mostramos el mensaje en la interfaz inmediatamente (Optimista)
-        setMessages(prev => [...prev, newMessage]);
-        setMessageInput("");
+                const newMessage = {
+                    id: tempId,
+                    senderId: user.id,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                };
 
-        try {
-            await axios.post(`${API_URL}/api/messages/send`, {
-                senderId: user.id,
-                receiverId: activeContact, // Usamos el valor actualizado del Ref
-                content: content
-            });
-            console.log("Mensaje enviado");
-        } catch (error) {
-            console.error("Error enviando mensaje", error);
+                setMessages(prev => [...prev, newMessage]);
+                setMessageInput("");
+
+                await axios.post(`${API_URL}/api/messages/send`, {
+                    senderId: user.id,
+                    receiverId: activeContactRef.current,
+                    content: content
+                });
+                console.log("Mensaje enviado a la base de datos (Modo Humano)");
+            } catch (error) {
+                console.error("Error enviando mensaje:", error);
+                alert("Error al enviar mensaje de Humano");
+            }
         }
     };
+
+    // --- INTERFAZ DE USUARIO (Emojis + Imagen) ---
 
     const handleEmojiClick = (emoji) => {
         setMessageInput((prev) => prev + emoji);
@@ -199,12 +126,127 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         }
     };
 
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        sendMessageImage(messageInput);
+    };
+
+    // --- EFECTOS ---
+
+    // 1. Sincronizar el Ref con el Estado
+    useEffect(() => {
+        activeContactRef.current = selectedContactId;
+    }, [selectedContactId]);
+
+    // 2. Cargar Contactos
+    useEffect(() => {
+        const fetchContacts = async () => {
+            if (!user || !user.id) return;
+            try {
+                const response = await axios.get(`${API_URL}/api/auth/users`);
+                const allUsers = response.data;
+                const otherUsers = allUsers.filter(u => u.id !== user.id);
+                setContacts(otherUsers);
+                if (otherUsers.length > 0) {
+                    selectContact(otherUsers[0]);
+                }
+            } catch (error) {
+                console.error("Error cargando contactos", error);
+            }
+        };
+        fetchContacts();
+    }, [user.id]);
+
+    // 3. CONEXIÓN WEBSOCKET - CORREGIDO
+    useEffect(() => {
+        if (!user || !user.id) return;
+
+        if (stompClientRef.current && stompConnectedRef.current) {
+            console.log("Ya hay un WebSocket activo. Ignorando reconexión.");
+            return;
+        }
+
+        console.log("Iniciando conexión WebSocket...");
+        isConnectingRef.current = true;
+
+        const socket = new SockJS('http://localhost:8081/ws-chat', null, { withCredentials: false });
+        const client = Stomp.over(socket);
+        client.debug = () => {};
+
+        let subscription = null;
+
+        isMountedRef.current = true;
+
+        client.connect({}, () => {
+            console.log('Conectado al WebSocket');
+            stompClientRef.current = client;
+            stompConnectedRef.current = true;
+
+            // SUSCRIPCIÓN AL TOPICO GLOBAL DE MENSAJES
+            subscription = client.subscribe('/topic/messages', (message) => {
+                // CHEQUEO DE SEGURIDAD 1: ¿Sigo vivo?
+                if (!isMountedRef.current) {
+                    console.warn("Componente desmontado. Ignorando mensaje.");
+                    return;
+                }
+
+                const newMessage = JSON.parse(message.body);
+                const activeId = activeContactRef.current;
+
+                // CHEQUEO DE SEGURIDAD 2: ¿Estoy conectado?
+                if (!stompConnectedRef.current) {
+                    console.warn("WebSocket no conectado. Ignorando mensaje.");
+                    return;
+                }
+
+                const isForMe =
+                    (newMessage.receiverId === user.id && activeId === newMessage.senderId) ||
+                    (newMessage.senderId === user.id && activeId === newMessage.receiverId);
+
+                if (isForMe) {
+                    console.log(">>> RESULTADO: MOSTRAR MENSAJE");
+                    setMessages(prev => {
+                        // EVITAR DUPLICADOS (Defensa Extra)
+                        if (prev.some(msg => msg.id === newMessage.id)) {
+                            return prev;
+                        }
+                        return [...prev, newMessage];
+                    });
+                } else {
+                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
+                }
+            });
+
+        }, (error) => {
+            console.error("Error conectando WebSocket", error);
+            isConnectingRef.current = false;
+            stompConnectedRef.current = false;
+        });
+
+        // LIMPIEZA
+        return () => {
+            console.log("Desmontando WebSocket...");
+            isMountedRef.current = false;
+            isConnectingRef.current = false;
+
+            if (subscription) {
+                subscription.unsubscribe();
+            }
+
+            if (client && client.connected) {
+                stompConnectedRef.current = false;
+                try { client.disconnect(); } catch(e){}
+                stompClientRef.current = null;
+            }
+        };
+    }, [user.id]); // CORREGIDO: Dependencia en la posición correcta
+
+    // --- RENDERIZADO (INTERFAZ DE USUARIO) ---
+
     return (
         <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
-
-            {/* BARRA LATERAL IZQUIERDA */}
+            {/* --- BARRA LATERAL --- */}
             <div className="w-80 flex flex-col border-r border-slate-700 bg-slate-800">
-
                 {/* HEADER */}
                 <div className="p-4 border-b border-slate-700 flex justify-between items-center">
                     <div className="flex items-center gap-2">
@@ -214,42 +256,51 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         <span className="font-semibold truncate">{user.username}</span>
                     </div>
 
-                    {/* BOTONES DE ACCIÓN */}
                     <div className="flex gap-2">
-                        {/* BOTÓN IA (NUEVO - Cabecera) */}
-                        <button
-                            onClick={() => setChatMode(chatMode === 'human' ? 'ai' : 'human')}
-                            title={chatMode === 'ai' ? 'Desactivar IA' : 'Activar IA'}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition ${
-                                chatMode === 'ai'
-                                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                                    : 'bg-slate-700 hover:bg-slate-600 text-gray-300 hover:text-white'
-                            }`}
-                        >
-                            {chatMode === 'ai' ? '🤖' : '🤖'}
-                        </button>
-
+                        {/* Botón Ayuda */}
                         <button
                             onClick={onHelp}
                             className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
                             title="Ayuda"
-                        >❓</button>
+                        >
+                            ❓
+                        </button>
 
+                        {/* Botón Cerrar Sesión */}
                         <button
                             onClick={onLogout}
                             className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 text-red-400 hover:text-red-300 transition"
                             title="Cerrar Sesión"
-                        >🚪</button>
+                        >
+                            🚪
+                        </button>
 
+                        {/* Botón Editar Perfil */}
                         <button
                             onClick={onEditProfile}
-                            className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-700 transition"
+                            className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
                             title="Editar Perfil"
-                        >⚙️</button>
+                        >
+                            ⚙️
+                        </button>
+
+                        {/* BOTÓN MODO IA */}
+                        <button
+                            onClick={() => setChatMode(chatMode === 'human' ? 'ai' : 'human')}
+                            title="Alternar Modo IA"
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
+                                chatMode === 'ai'
+                                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                            }`}
+                        >
+                            🤖
+                            {chatMode === 'ai' && <span className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></span>}
+                        </button>
                     </div>
                 </div>
 
-                {/* BÚSQUEDOR */}
+                {/* BUSCADOR */}
                 <div className="p-4">
                     <input
                         type="text"
@@ -259,7 +310,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                     />
                 </div>
 
-                {/* CONTACTOS */}
+                {/* LISTA DE CONTACTOS */}
                 <div className="flex-1 overflow-y-auto">
                     {contacts.map(contact => (
                         <div
@@ -275,6 +326,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                 </div>
                                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></span>
                             </div>
+
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-medium truncate">{contact.username}</h4>
                                 <p className="text-sm text-gray-400 truncate">Contacto disponible</p>
@@ -284,11 +336,11 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                 </div>
             </div>
 
-            {/* VENTANA DE CHAT (RESTO) */}
-            <div className="flex-1 flex-col bg-slate-900">
-                {activeContactRef.current ? (
+            {/* VENTANA DE CHAT */}
+            <div className="flex-1 flex flex-col bg-slate-900">
+                {selectedContactId ? (
                     <>
-                        {/* HEADER DEL CHAT */}
+                        {/* HEADER CHAT */}
                         <div className="p-4 border-b border-slate-700 bg-slate-800 flex justify-between items-center shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="relative">
@@ -308,24 +360,11 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                             </div>
                         </div>
 
-                        {/* MODO IA VS HUMANO */}
-                        <div className="px-4 py-2">
-                            <button
-                                onClick={() => setChatMode('human')}
-                                className={`w-full text-center py-2 rounded-md font-semibold transition-colors ${
-                                    chatMode === 'human' ? 'bg-slate-700 text-gray-400 hover:bg-slate-700 text-gray-400'
-                                        : 'bg-purple-600 text-white hover:bg-purple-700'
-                                }`}
-                            >
-                                {chatMode === 'human' ? "Modo Humano" : "Modo Chat con IA"}
-                            </button>
-                        </div>
-
-                        {/* Área de Mensajes */}
+                        {/* MENSAJES */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {messages.length === 0 && (
                                 <div className="text-center text-gray-500 mt-10">
-                                    {chatMode === 'human' ? "Envía el primer mensaje..." : "Pregunta algo para empezar..."}
+                                    {chatMode === 'human' ? "Envía el primer mensaje..." : "La IA generando respuesta..."}
                                 </div>
                             )}
 
@@ -336,9 +375,8 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                             ? 'bg-blue-600 text-white rounded-tr-none'
                                             : 'bg-slate-700 text-gray-200 rounded-tl-none'
                                     }`}>
-
                                         {/* DETECTAR SI ES IMAGEN O TEXTO */}
-                                        {msg.content.startsWith('data:image') ? (
+                                        {msg.content && msg.content.startsWith('data:image') ? (
                                             <img src={msg.content} alt="Imagen" className="rounded max-w-full h-auto" />
                                         ) : (
                                             <p>{msg.content}</p>
@@ -347,103 +385,82 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                         <div className={`text-[10px] mt-1 text-right ${
                                             msg.senderId === user.id ? 'text-blue-200' : 'text-gray-500'
                                         }`}>
-                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' )}
-                                                </div>
-                                                </div>
-                                                </div>
-                                                ))}
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
-
-                                        {/* Input Area */}
-                                        <div className="p-4 border-t border-slate-700 bg-slate-800 relative">
-
-                                            {/* INPUT DE ARCHIVO OCULTO */}
-                                            <input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={handleImageUpload}
-                                            />
-
-                                            {/* PICKER DE EMOJIS */}
-                                            {showEmojiPicker && (
-                                                <div className="absolute bottom-16 left-4 bg-slate-700 p-3 rounded-lg shadow-xl border border-slate-600 z-50">
-                                                    <div className="grid grid-cols-6 gap-2">
-                                                        {['😀','😂','😍','🥺','😎','🤔','👍','👎','❤️','🔥','🎉','🚀','👻','💩','👋','🙏','👀','💪','🧠','🔨'].map((emoji, idx) => (
-                                                            <button
-                                                                key={idx}
-                                                                onClick={() => handleEmojiClick(emoji)}
-                                                                className="text-2xl hover:scale-125 transition"
-                                                            >
-                                                                {emoji}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-
-                                                {/* BOTÓN + (Cargar Imagen) */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => fileInputRef.current.click()}
-                                                    className="p-2 text-gray-400 hover:text-white transition relative"
-                                                >
-                                                    ➕
-                                                </button>
-
-                                                <input
-                                                    type="text"
-                                                    value={messageInput}
-                                                    onChange={(e) => setMessageInput(e.target.value)}
-                                                    placeholder="Type a message..."
-                                                    className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                />
-
-                                                {/* BOTÓN CARA FELIZ (Emojis) */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                                    className="p-2 text-gray-400 hover:text-white transition relative"
-                                                >
-                                                    😊
-                                                    {showEmojiPicker && <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>}
-                                                </button>
-
-                                                {/* BOTÓN IA (Alternar Chat Humano vs IA) */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setChatMode(chatMode === 'human' ? 'ai' : 'human')}
-                                                    title={chatMode === 'human' ? 'Cambiar a Chat con IA' : 'Cambiar a Modo Humano'}
-                                                    className={`flex-1 flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-colors ${
-                                                        chatMode === 'ai'
-                                                            ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                                                            : 'bg-slate-700 text-gray-400 hover:bg-slate-700 text-gray-200'
-                                                    }`}
-                                                >
-                                                    {chatMode === 'ai' ? '🤖' : '👤'}
-                                                    {chatMode === 'ai' ? 'Chatear con IA' : 'Chatear sin IA'}
-                                                </button>
-
-                                                <button
-                                                    type="submit"
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 transition flex items-center justify-center"
-                                                >
-                                                    ➤
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </>
-                                    ) : (
-                                    <div className="flex-1 flex items-center justify-center text-gray-500">
-                                        Selecciona un contacto para chatear
                                     </div>
-                                    )}
                                 </div>
+                            ))}
+                        </div>
+
+                        {/* INPUT AREA */}
+                        <div className="p-4 border-t border-slate-700 bg-slate-800 relative">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+
+                            {/* EMOJI PICKER */}
+                            {showEmojiPicker && (
+                                <div className="absolute bottom-16 left-4 bg-slate-700 p-3 rounded-lg shadow-xl border border-slate-600 z-50">
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {['😀','😂','😍','🥺','😎','🤔','👍','👎','❤️','🔥','🎉','🚀','👻','💩','👋','🙏','👀','💪','🧠','🔨'].map((emoji, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleEmojiClick(emoji)}
+                                                className="text-2xl hover:scale-125 transition"
+                                            >
+                                                {emoji}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                                );
-                            };
+                            )}
+
+                            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                                {/* BOTÓN + (Subir Imagen) */}
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current.click()}
+                                    className="p-2 text-gray-400 hover:text-white transition relative"
+                                >
+                                    ➕
+                                </button>
+
+                                <input
+                                    type="text"
+                                    value={messageInput}
+                                    onChange={(e) => setMessageInput(e.target.value)}
+                                    placeholder="Type a message..."
+                                    className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+
+                                {/* BOTÓN CARA FELIZ (Emojis) */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    className="p-2 text-gray-400 hover:text-white transition relative"
+                                >
+                                    😊
+                                    {showEmojiPicker && <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>}
+                                </button>
+
+                                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition flex items-center justify-center">
+                                    ➤
+                                </button>
+                            </form>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex-1 flex items-center justify-center text-gray-500">
+                        <p>Selecciona un contacto para chatear</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default MainChat;
