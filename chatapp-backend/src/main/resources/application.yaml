@@ -15,3 +15,10 @@ spring:
 
 server:
   port: ${SERVER_PORT}
+
+ai:
+
+  provider-url: ${AI_PROVIDER_URL:https://api.openai.com/v1}
+  model-name: ${AI_MODEL:gpt-3.5-turbo}
+  api-key: ${AI_API_KEY:sk-tu-api-key-aqui}
+  system-prompt: You are a helpful AI assistant in a chat app. Be concise and friendly.
