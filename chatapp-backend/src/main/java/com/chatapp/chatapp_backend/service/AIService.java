@@ -3,7 +3,7 @@ package com.chatapp.chatapp_backend.service;
 import com.chatapp.chatapp_backend.dto.AIMessageDto;
 import com.chatapp.chatapp_backend.dto.AIRequestDto;
 import com.chatapp.chatapp_backend.dto.AIResponseDto;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,36 +16,35 @@ import java.util.Map;
 public class AIService {
 
     private final RestTemplate restTemplate;
+    private final Environment env; // Inyectamos el entorno directamente
 
-    // INYECCIÓN DE PROPIEDADES DIRECTAS (Desde application.yaml)
-    @Value("${ai.provider-url}")
-    private String providerUrl;
-
-    @Value("${ai.model-name}")
-    private String modelName;
-
-    @Value("${ai.api-key}")
-    private String apiKey;
-
-    @Value("${ai.system-prompt}")
-    private String systemPrompt;
-
-    // CONSTRUCTOR SIMPLIFICADO
-    public AIService(RestTemplate restTemplate) {
+    public AIService(RestTemplate restTemplate, Environment env) {
         this.restTemplate = restTemplate;
+        this.env = env;
     }
 
     public String generateResponse(String userMessage, String conversationHistoryJson) {
         try {
-            // 1. Construir URL
+            // 1. Leer propiedades usando Environment (Método robusto)
+            String providerUrl = env.getProperty("ai.provider-url");
+            String modelName = env.getProperty("ai.model-name");
+            String apiKey = env.getProperty("ai.api-key");
+            String systemPrompt = env.getProperty("ai.system-prompt");
+
+            // Validación rápida
+            if (apiKey == null) {
+                return "Error: No se encontró la API Key en el archivo application.yaml";
+            }
+
+            // 2. Construir URL
             String url = providerUrl + "/chat/completions";
 
-            // 2. Headers
+            // 3. Headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(apiKey);
 
-            // 3. Mensajes
+            // 4. Mensajes
             AIMessageDto systemMsg = new AIMessageDto();
             systemMsg.setRole("system");
             systemMsg.setContent(systemPrompt);
@@ -58,7 +57,6 @@ public class AIService {
             messagesList.add(systemMsg);
             messagesList.add(userMsg);
 
-            // 4. Request Body
             AIRequestDto request = new AIRequestDto(modelName, messagesList);
 
             // 5. Petición
@@ -79,7 +77,7 @@ public class AIService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error conectando con la IA. Verifica tu API Key y URL.";
+            return "Error conectando con la IA. Verifica tu API Key.";
         }
     }
 }
