@@ -1,24 +1,29 @@
 package com.chatapp.chatapp_backend.service;
 
 import com.chatapp.chatapp_backend.config.AIConfig;
-import com.chatapp.chatapp_backend.dto.AIMessageDto; // Importar nueva clase
+import com.chatapp.chatapp_backend.dto.AIMessageDto;
 import com.chatapp.chatapp_backend.dto.AIRequestDto;
 import com.chatapp.chatapp_backend.dto.AIResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AIService {
 
-    @Autowired
-    private AIConfig aiConfig;
+    // CAMBIO: Usamos variables finales para inyección por constructor
+    private final AIConfig aiConfig;
+    private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    // INYECCIÓN POR CONSTRUCTOR
+    public AIService(AIConfig aiConfig) {
+        this.aiConfig = aiConfig;
+        this.restTemplate = new RestTemplate();
+    }
 
     public String generateResponse(String userMessage, String conversationHistoryJson) {
         try {
@@ -28,7 +33,7 @@ public class AIService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(aiConfig.getApiKey());
 
-            // Construir mensajes con la nueva clase
+            // Construir mensajes con la clase externa
             AIMessageDto systemMsg = new AIMessageDto();
             systemMsg.setRole("system");
             systemMsg.setContent(aiConfig.getSystemPrompt());
