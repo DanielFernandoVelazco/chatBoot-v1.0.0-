@@ -8,11 +8,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AIRequestDto {
     private String model;
-    private List<Message> messages;
-
-    @Data
-    public static class Message {
-        private String role; // "system", "user", "assistant"
-        private String content;
-    }
+    private List<AIMessageDto> messages; // Usamos la nueva clase aquí
 }
