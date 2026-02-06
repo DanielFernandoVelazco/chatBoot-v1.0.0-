@@ -1,101 +1,142 @@
-ChatApp Backend (Spring Boot + PostgreSQL)
-API RESTful para una aplicación de mensajería instantánea. Desarrollada con Java 17, Spring Boot, JPA y PostgreSQL.
+# Primeros pasos – ChatBoot v1.0.0
 
-🛠 Tech Stack
-Java 17
-Spring Boot 3.x
-Spring Data JPA
-Spring Security
-PostgreSQL
-Maven
-Lombok
-📋 Requisitos Previos
-Java 17 instalado.
-Maven instalado.
-Docker (opcional, recomendado para la base de datos).
-🚀 Instalación y Ejecución
-Clonar el repositorio y entrar en el directorio:
+## Descripción general
+Este documento guía la configuración y ejecución de **ChatBoot v1.0.0** en un entorno local, incluyendo:
+- Frontend en **React + Vite**
+- Backend en **Spring Boot**
+- Base de datos **PostgreSQL**
+- Integración con un proveedor de IA compatible con OpenAI
+
+Al finalizar, la aplicación de chat estará funcionando localmente.
+
+---
+
+## Arquitectura del sistema
+
+| Componente | Tecnología | Puerto | Directorio |
+|----------|-----------|--------|------------|
+| Frontend | React + Vite | 5173 | chatapp-frontend |
+| Backend | Spring Boot 4.0.2 | 8081 | chatapp-backend |
+
+Servicios externos requeridos:
+- PostgreSQL
+- API de proveedor de IA (OpenAI o compatible)
+
+---
+
+## Requisitos previos
+
+- JDK 17  
+- Maven  
+- Node.js 18+ y npm  
+- PostgreSQL 12+  
+- Clave API del proveedor de IA  
+
+---
+
+## Configuración del Backend
+
+### 1. Base de datos
+```sql
+CREATE DATABASE chatapp;
+CREATE USER chatapp_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE chatapp TO chatapp_user;
+```
+
+### 2. Variables de entorno (.env)
+```env
+DB_URL=jdbc:postgresql://localhost:5432/chatapp
+DB_USER=chatapp_user
+DB_PASSWORD=your_password
+SERVER_PORT=8081
+AI_PROVIDER_URL=https://api.openai.com/v1
+AI_MODEL=gpt-3.5-turbo
+AI_API_KEY=sk-your-openai-api-key
+```
+
+### 3. Ejecución
+```bash
 cd chatapp-backend
-Configurar la Base de Datos (Docker):
-Ejecuta el siguiente comando para levantar una instancia de PostgreSQL rápidamente:
-
-docker run --name chatapp-postgres -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=chatapp_db -p 5432:5432 -d postgres:latest
-
-Configurar Variables de Entorno:
-Copia el archivo de ejemplo:
-
-cp .env.example .env
-
-(Edita .env si necesitas cambiar el puerto o la contraseña).
-Compilar el proyecto:
-
 mvn clean install
-
-Ejecutar la aplicación:
-
 mvn spring-boot:run
+```
 
-La aplicación iniciará en http://localhost:8081.
-🧪 Ejecutar Tests
-Para ejecutar los tests de integración y unitarios:
+Backend disponible en: http://localhost:8081
 
-mvn test
+---
 
-🏗 Estructura del Proyecto
+## Configuración del Frontend
 
-src/
-├── main/
-│   ├── java/
-│   │   └── com/chatapp/chatapp_backend/
-│   │       ├── ChatappBackendApplication.java
-│   │       ├── config/
-│   │       │   └── SecurityConfig.java        # Configuración de Seguridad y CORS
-│   │       ├── controller/
-│   │       │   └── AuthController.java        # Endpoints de Autenticación
-│   │       ├── dto/
-│   │       │   ├── UserRegistrationDto.java  # Datos de entrada
-│   │       │   └── UserResponseDto.java      # Datos de salida (Sin password)
-│   │       ├── model/
-│   │       │   └── User.java                 # Entidad JPA
-│   │       ├── repository/
-│   │       │   └── UserRepository.java        # Interfaz JPA
-│   │       └── service/
-│   │           ├── UserService.java           # Interfaz Servicio
-│   │           └── UserServiceImpl.java      # Lógica de Negocio
-│   └── resources/
-│       └── application.yaml                  # Configuración (usa variables de entorno)
-└── test/
-    └── java/
-        └── com/chatapp/chatapp_backend/
-            └── repository/
-                └── UserRepositoryTest.java    # Tests de integración DB
+### Instalación
+```bash
+cd chatapp-frontend
+npm install
+```
 
-📡 Endpoints (API)
-Registro de Usuario
-POST /api/auth/register
-Descripción: Registra un nuevo usuario en la base de datos.
-Body (JSON):
+### Ejecución
+```bash
+npm run dev
+```
 
-{
-  "username": "ejemplo_usuario",
-  "email": "usuario@ejemplo.com",
-  "password": "password123"
-}
+Frontend disponible en: http://localhost:5173
 
-Response (200 OK):
+---
 
-{
-  "id": 1,
-  "username": "ejemplo_usuario",
-  "email": "usuario@ejemplo.com",
-  "profilePhotoUrl": null,
-  "bio": null,
-  "online": false,
-  "createdAt": "2024-01-26T21:00:00"
-}
+## Verificación
 
-🔐 Seguridad
-El proyecto utiliza Spring Security.
-Los endpoints bajo /api/auth/** son públicos.
-Se ha configurado CORS para permitir conexiones desde el frontend (por defecto *).
-*Nota: La contraseña aún no está encriptada en esta fase (Próximo paso de mejora).
+- Backend:
+```bash
+curl http://localhost:8081/api/auth/users
+```
+
+- Frontend:
+Abrir http://localhost:5173 en el navegador.
+
+- WebSocket:
+Conexión a `ws://localhost:8081/ws-chat`
+
+---
+
+## Perfiles de entorno
+
+| Perfil | Base de datos | Uso |
+|------|---------------|-----|
+| Desarrollo | H2 en memoria | Pruebas locales |
+| Producción | PostgreSQL | Despliegue |
+
+Ejemplo H2:
+```env
+DB_URL=jdbc:h2:mem:testdb
+DB_USER=sa
+DB_PASSWORD=
+```
+
+---
+
+## Seguridad
+
+- CORS: http://localhost:5173
+- CSRF: deshabilitado
+- Endpoints públicos:
+  - /api/auth/**
+  - /api/messages/**
+  - /ws-chat/**
+- Hash de contraseñas: BCrypt
+
+---
+
+## Solución de problemas comunes
+
+- **Driver PostgreSQL no encontrado**: verificar DB_URL y servicio activo
+- **Errores CORS**: confirmar puerto 5173
+- **401 en IA**: validar AI_API_KEY
+
+---
+
+## Próximos pasos
+
+- Arquitectura
+- Autenticación de usuarios
+- Mensajería en tiempo real
+- Referencia de la API
+- Modelos de datos
