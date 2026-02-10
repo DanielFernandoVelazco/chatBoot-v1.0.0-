@@ -30,6 +30,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/messages/**").permitAll()
 
+                        // PERMITE Endpoints de Soporte (NUEVO)
+                        .requestMatchers("/api/support/**").permitAll()
+
                         // PERMITE WEBSOCKET (AGREGAR ESTO)
                         .requestMatchers("/ws-chat/**").permitAll()
 
