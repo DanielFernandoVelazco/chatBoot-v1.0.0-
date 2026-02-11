@@ -36,6 +36,10 @@ public class User {
     @Column(nullable = false)
     private Boolean notificationsEnabled = true;
 
+    // NUEVO CAMPO: Permitir ver última conexión
+    @Column(name = "allow_last_seen", nullable = false)
+    private Boolean allowLastSeen = true;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
