@@ -81,6 +81,7 @@ function App() {
                 />
             ) : view === 'help' && currentUser ? (
                 <HelpSupport
+                    user={currentUser}
                     onBack={() => setView('chat')}
                 />
             ) : view === 'login' ? (
