@@ -5,9 +5,10 @@ import HelpTerms from './help/HelpTerms';
 import HelpAccountManagement from './help/HelpAccountManagement';
 import HelpSecurityPrivacy from './help/HelpSecurityPrivacy';
 import HelpTroubleshooting from './help/HelpTroubleshooting';
+import SystemStatus from './help/SystemStatus'; // <-- NUEVO IMPORT
 
 const HelpSupport = ({ onBack, user }) => {
-    const [currentView, setCurrentView] = useState('main'); // main, faq, contact, terms, account, security, troubleshooting
+    const [currentView, setCurrentView] = useState('main'); // main, faq, contact, terms, account, security, troubleshooting, systemstatus
 
     // Renderizar según la vista seleccionada
     const renderView = () => {
@@ -24,6 +25,8 @@ const HelpSupport = ({ onBack, user }) => {
                 return <HelpSecurityPrivacy onBack={() => setCurrentView('main')} />;
             case 'troubleshooting':
                 return <HelpTroubleshooting onBack={() => setCurrentView('main')} />;
+            case 'systemstatus': // <-- NUEVO CASO
+                return <SystemStatus onBack={() => setCurrentView('main')} />;
             default:
                 return (
                     <div className="min-h-screen bg-slate-900 text-white">
@@ -138,7 +141,7 @@ const HelpSupport = ({ onBack, user }) => {
                                 </div>
                             </div>
 
-                            {/* Sección 3: Estado del sistema */}
+                            {/* Sección 3: Estado del sistema - MODIFICADO */}
                             <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
                                 <div className="flex items-center justify-between flex-wrap gap-4">
                                     <div className="flex items-center gap-4">
@@ -151,8 +154,11 @@ const HelpSupport = ({ onBack, user }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">
-                                        Ver estado detallado
+                                    <button
+                                        onClick={() => setCurrentView('systemstatus')} // <-- NUEVO
+                                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition hover:scale-105 active:scale-95"
+                                    >
+                                        Ver estado detallado →
                                     </button>
                                 </div>
                             </div>
