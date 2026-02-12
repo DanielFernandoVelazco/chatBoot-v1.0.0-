@@ -188,22 +188,6 @@ const HelpSupport = ({ onBack, user }) => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Sección 5: Feedback */}
-                            <div className="text-center p-6 bg-slate-800/30 rounded-lg">
-                                <p className="text-gray-400 mb-3">¿Te fue útil esta sección de ayuda?</p>
-                                <div className="flex justify-center gap-4">
-                                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition flex items-center gap-2">
-                                        👍 Sí
-                                    </button>
-                                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition flex items-center gap-2">
-                                        👎 No
-                                    </button>
-                                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition flex items-center gap-2">
-                                        💡 Sugerir mejora
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 );
