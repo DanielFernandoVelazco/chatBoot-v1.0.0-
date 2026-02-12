@@ -13,7 +13,8 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const [messageInput, setMessageInput] = useState("");
     const [stompClient, setStompClient] = useState(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [chatMode, setChatMode] = useState('human'); // 'human' o 'ai'
+    const [chatMode, setChatMode] = useState('human');
+    const [isConnected, setIsConnected] = useState(false);
 
     // --- REFs ---
     const fileInputRef = useRef(null);
@@ -21,11 +22,12 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
     const stompClientRef = useRef(null);
     const stompConnectedRef = useRef(false);
     const isMountedRef = useRef(false);
-    const isConnectingRef = useRef(false); // AÑADIDO: variable faltante
+    const isConnectingRef = useRef(false);
+    const processedMessageIds = useRef(new Set()); // NUEVO: Set para IDs procesados
 
     const API_URL = 'http://localhost:8081';
 
-    // --- FUNCIONES DE LÓGICA DEL CHAT (FUERA DE LOS EFFECTS) ---
+    // --- FUNCIONES DE LÓGICA DEL CHAT ---
 
     const loadMessages = async (id1, id2) => {
         try {
@@ -44,69 +46,85 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         setSelectedContactId(contactId);
         setSelectedContactName(contact.username);
         loadMessages(user.id, contactId);
+        // Limpiar Set de mensajes procesados al cambiar de contacto
+        processedMessageIds.current.clear();
     };
 
     const sendMessageImage = async (content) => {
-        // Validaciones básicas
-        if (!content || content === "") return;
-        if (typeof content === 'string' && !content.trim()) return;
-
+        if (!content || !content.trim()) return;
         if (!activeContactRef.current) return;
 
-        // ---------------------------------------------------------
-        // LÓGICA DE ENVÍO: HUMANO vs IA
-        // ---------------------------------------------------------
+        // Generar ID temporal único
+        const tempId = `temp-${Date.now()}-${Math.random()}`;
+
         if (chatMode === 'ai') {
-            // MODO IA: Enviar a la IA para obtener respuesta
+            // MODO IA
             try {
-                console.log("--- MODO IA ACTIVO ---");
+                const tempMessage = {
+                    id: tempId,
+                    senderId: -1,
+                    senderName: 'Asistente AI',
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    isTemp: true // Marcar como temporal
+                };
+
+                // Agregar mensaje temporal del usuario
+                const userTempMessage = {
+                    id: `temp-user-${Date.now()}`,
+                    senderId: user.id,
+                    senderName: user.username,
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    isTemp: true
+                };
+                setMessages(prev => [...prev, userTempMessage]);
+                setMessageInput("");
+
                 const response = await axios.post(`${API_URL}/api/ai/chat`, {
                     message: content
                 });
 
                 const aiMessage = {
-                    id: -1,
+                    id: `ai-${Date.now()}`,
                     senderId: -1,
-                    content: response.data,
+                    senderName: 'Asistente AI',
+                    content: response.data.content,
                     timestamp: new Date().toISOString()
                 };
-                setMessages(prev => [...prev, aiMessage]);
-                setMessageInput("");
-                console.log("Mensaje enviado a IA");
+
+                // Reemplazar mensaje temporal con el real de la IA
+                setMessages(prev => prev.filter(msg => msg.id !== userTempMessage.id).concat([aiMessage]));
+
             } catch (error) {
                 console.error("Error en la IA:", error);
-                alert("Error de IA: " + (error.response?.data?.error || error.message || "Verifica tu API Key y URL en application.yaml"));
+                alert("Error de IA: " + (error.response?.data?.error || error.message));
+                // Eliminar mensaje temporal en caso de error
+                setMessages(prev => prev.filter(msg => msg.id !== tempId));
             }
         } else {
-            // MODO HUMANO: Enviar a la base de datos directamente
+            // MODO HUMANO - CORREGIDO: Sin duplicación
             try {
-                const tempId = Date.now();
+                // 1. NO agregamos mensaje optimista aquí - esperamos confirmación del WebSocket
 
-                const newMessage = {
-                    id: tempId,
-                    senderId: user.id,
-                    content: content,
-                    timestamp: new Date().toISOString()
-                };
-
-                setMessages(prev => [...prev, newMessage]);
-                setMessageInput("");
-
-                await axios.post(`${API_URL}/api/messages/send`, {
+                // 2. Enviar al backend
+                const response = await axios.post(`${API_URL}/api/messages/send`, {
                     senderId: user.id,
                     receiverId: activeContactRef.current,
                     content: content
                 });
-                console.log("Mensaje enviado a la base de datos (Modo Humano)");
+
+                // 3. El mensaje llegará por WebSocket, NO lo agregamos manualmente
+                setMessageInput("");
+
             } catch (error) {
                 console.error("Error enviando mensaje:", error);
-                alert("Error al enviar mensaje de Humano");
+                alert("Error al enviar mensaje");
             }
         }
     };
 
-    // --- INTERFAZ DE USUARIO (Emojis + Imagen) ---
-
+    // --- INTERFAZ DE USUARIO ---
     const handleEmojiClick = (emoji) => {
         setMessageInput((prev) => prev + emoji);
         setShowEmojiPicker(false);
@@ -133,7 +151,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
 
     // --- EFECTOS ---
 
-    // 1. Sincronizar el Ref con el Estado
+    // 1. Sincronizar Ref con Estado
     useEffect(() => {
         activeContactRef.current = selectedContactId;
     }, [selectedContactId]);
@@ -157,10 +175,9 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         fetchContacts();
     }, [user.id]);
 
-    // 3. CONEXIÓN WEBSOCKET - CORREGIDO
+    // 3. CONEXIÓN WEBSOCKET - CORREGIDO: Sin duplicación
     useEffect(() => {
         if (!user || !user.id) return;
-
         if (stompClientRef.current && stompConnectedRef.current) {
             console.log("Ya hay un WebSocket activo. Ignorando reconexión.");
             return;
@@ -174,29 +191,35 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
         client.debug = () => {};
 
         let subscription = null;
-
         isMountedRef.current = true;
 
         client.connect({}, () => {
-            console.log('Conectado al WebSocket');
+            console.log('✅ Conectado al WebSocket');
             stompClientRef.current = client;
             stompConnectedRef.current = true;
+            setIsConnected(true);
 
             // SUSCRIPCIÓN AL TOPICO GLOBAL DE MENSAJES
             subscription = client.subscribe('/topic/messages', (message) => {
-                // CHEQUEO DE SEGURIDAD 1: ¿Sigo vivo?
-                if (!isMountedRef.current) {
-                    console.warn("Componente desmontado. Ignorando mensaje.");
-                    return;
-                }
+                if (!isMountedRef.current) return;
 
                 const newMessage = JSON.parse(message.body);
                 const activeId = activeContactRef.current;
 
-                // CHEQUEO DE SEGURIDAD 2: ¿Estoy conectado?
-                if (!stompConnectedRef.current) {
-                    console.warn("WebSocket no conectado. Ignorando mensaje.");
+                // NUEVO: Evitar duplicados con Set
+                const messageKey = `${newMessage.id}-${newMessage.timestamp}`;
+                if (processedMessageIds.current.has(messageKey)) {
+                    console.log("⏭️ Mensaje duplicado ignorado:", messageKey);
                     return;
+                }
+
+                // Marcar como procesado
+                processedMessageIds.current.add(messageKey);
+
+                // Limitar tamaño del Set (opcional)
+                if (processedMessageIds.current.size > 100) {
+                    const iterator = processedMessageIds.current.values();
+                    processedMessageIds.current.delete(iterator.next().value);
                 }
 
                 const isForMe =
@@ -204,23 +227,22 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                     (newMessage.senderId === user.id && activeId === newMessage.receiverId);
 
                 if (isForMe) {
-                    console.log(">>> RESULTADO: MOSTRAR MENSAJE");
+                    console.log("📨 Nuevo mensaje recibido:", newMessage);
                     setMessages(prev => {
-                        // EVITAR DUPLICADOS (Defensa Extra)
-                        if (prev.some(msg => msg.id === newMessage.id)) {
+                        // Verificar duplicado por ID
+                        if (prev.some(msg => msg.id === newMessage.id && msg.timestamp === newMessage.timestamp)) {
                             return prev;
                         }
                         return [...prev, newMessage];
                     });
-                } else {
-                    console.log(">>> RESULTADO: IGNORAR (Es de otro chat)");
                 }
             });
 
         }, (error) => {
-            console.error("Error conectando WebSocket", error);
+            console.error("❌ Error conectando WebSocket", error);
             isConnectingRef.current = false;
             stompConnectedRef.current = false;
+            setIsConnected(false);
         });
 
         // LIMPIEZA
@@ -235,14 +257,14 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
 
             if (client && client.connected) {
                 stompConnectedRef.current = false;
+                setIsConnected(false);
                 try { client.disconnect(); } catch(e){}
                 stompClientRef.current = null;
             }
         };
-    }, [user.id]); // CORREGIDO: Dependencia en la posición correcta
+    }, [user.id]);
 
-    // --- RENDERIZADO (INTERFAZ DE USUARIO) ---
-
+    // --- RENDERIZADO ---
     return (
         <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
             {/* --- BARRA LATERAL --- */}
@@ -257,7 +279,9 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                     </div>
 
                     <div className="flex gap-2">
-                        {/* Botón Ayuda */}
+                        {/* Indicador de conexión WebSocket */}
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'} mt-3`} title={isConnected ? 'Conectado' : 'Desconectado'}></div>
+
                         <button
                             onClick={onHelp}
                             className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
@@ -265,8 +289,6 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         >
                             ❓
                         </button>
-
-                        {/* Botón Cerrar Sesión */}
                         <button
                             onClick={onLogout}
                             className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 text-red-400 hover:text-red-300 transition"
@@ -274,8 +296,6 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         >
                             🚪
                         </button>
-
-                        {/* Botón Editar Perfil */}
                         <button
                             onClick={onEditProfile}
                             className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-600 transition"
@@ -283,12 +303,10 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         >
                             ⚙️
                         </button>
-
-                        {/* BOTÓN MODO IA */}
                         <button
                             onClick={() => setChatMode(chatMode === 'human' ? 'ai' : 'human')}
                             title="Alternar Modo IA"
-                            className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition relative ${
                                 chatMode === 'ai'
                                     ? 'bg-purple-600 hover:bg-purple-700 text-white'
                                     : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
@@ -322,11 +340,10 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                         >
                             <div className="relative">
                                 <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold">
-                                    {contact.username.charAt(0)}
+                                    {contact.username?.charAt(0) || '?'}
                                 </div>
                                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></span>
                             </div>
-
                             <div className="flex-1 min-w-0">
                                 <h4 className="font-medium truncate">{contact.username}</h4>
                                 <p className="text-sm text-gray-400 truncate">Contacto disponible</p>
@@ -345,7 +362,7 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                             <div className="flex items-center gap-3">
                                 <div className="relative">
                                     <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center font-bold">
-                                        {selectedContactName.charAt(0)}
+                                        {selectedContactName?.charAt(0) || '?'}
                                     </div>
                                     <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></span>
                                 </div>
@@ -375,17 +392,25 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                             ? 'bg-blue-600 text-white rounded-tr-none'
                                             : 'bg-slate-700 text-gray-200 rounded-tl-none'
                                     }`}>
-                                        {/* DETECTAR SI ES IMAGEN O TEXTO */}
+                                        {/* Nombre del remitente (si no es el usuario actual) */}
+                                        {msg.senderId !== user.id && msg.senderName && (
+                                            <p className="text-xs text-gray-400 mb-1">{msg.senderName}</p>
+                                        )}
+
                                         {msg.content && msg.content.startsWith('data:image') ? (
                                             <img src={msg.content} alt="Imagen" className="rounded max-w-full h-auto" />
                                         ) : (
-                                            <p>{msg.content}</p>
+                                            <p className="break-words">{msg.content}</p>
                                         )}
 
                                         <div className={`text-[10px] mt-1 text-right ${
                                             msg.senderId === user.id ? 'text-blue-200' : 'text-gray-500'
                                         }`}>
-                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) : ''}
+                                            {msg.isTemp && <span className="ml-2 text-yellow-300">⏳</span>}
                                         </div>
                                     </div>
                                 </div>
@@ -402,7 +427,6 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                 onChange={handleImageUpload}
                             />
 
-                            {/* EMOJI PICKER */}
                             {showEmojiPicker && (
                                 <div className="absolute bottom-16 left-4 bg-slate-700 p-3 rounded-lg shadow-xl border border-slate-600 z-50">
                                     <div className="grid grid-cols-6 gap-2">
@@ -420,7 +444,6 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                             )}
 
                             <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                                {/* BOTÓN + (Subir Imagen) */}
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current.click()}
@@ -433,18 +456,16 @@ const MainChat = ({ user, onLogout, onEditProfile, onAccountSettings, onHelp }) 
                                     type="text"
                                     value={messageInput}
                                     onChange={(e) => setMessageInput(e.target.value)}
-                                    placeholder="Type a message..."
+                                    placeholder={chatMode === 'ai' ? "Pregúntale algo a la IA..." : "Escribe un mensaje..."}
                                     className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
 
-                                {/* BOTÓN CARA FELIZ (Emojis) */}
                                 <button
                                     type="button"
                                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                                     className="p-2 text-gray-400 hover:text-white transition relative"
                                 >
                                     😊
-                                    {showEmojiPicker && <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>}
                                 </button>
 
                                 <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 px-4 transition flex items-center justify-center">
