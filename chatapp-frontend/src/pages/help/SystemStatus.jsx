@@ -157,7 +157,6 @@ const SystemStatus = ({ onBack }) => {
                                 : 'text-gray-400 hover:text-white hover:bg-slate-800/50'
                         }`}
                     >
-                        📅 Historial
                     </button>
                 </div>
             </div>
@@ -310,16 +309,6 @@ const SystemStatus = ({ onBack }) => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Botón de verificación manual */}
-                        <div className="flex justify-center">
-                            <button
-                                onClick={checkSystemStatus}
-                                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition flex items-center gap-2"
-                            >
-                                🔄 Verificar estado ahora
-                            </button>
-                        </div>
                     </>
                 )}
 
@@ -391,97 +380,10 @@ const SystemStatus = ({ onBack }) => {
                                 </div>
                             );
                         })}
-
-                        <div className="bg-blue-500/10 p-6 rounded-xl border border-blue-500/30 mt-6">
-                            <div className="flex items-center gap-4">
-                                <div className="text-3xl">📧</div>
-                                <div>
-                                    <p className="font-semibold mb-1">¿No encuentras un incidente?</p>
-                                    <p className="text-sm text-gray-400">
-                                        Si experimentas un problema no listado aquí, por favor contacta a soporte.
-                                    </p>
-                                </div>
-                                <button className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition">
-                                    Reportar problema
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 )}
 
-                {/* TAB: HISTORIAL */}
-                {activeTab === 'history' && (
-                    <div className="space-y-6">
-                        <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
-                            📅 Historial de disponibilidad
-                        </h3>
 
-                        {/* Calendario de estado */}
-                        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="font-semibold">Febrero 2026</h4>
-                                <div className="flex gap-2">
-                                    <button className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded hover:bg-slate-600">←</button>
-                                    <button className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded hover:bg-slate-600">→</button>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-7 gap-2">
-                                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-                                    <div key={day} className="text-center text-xs text-gray-500 py-2">{day}</div>
-                                ))}
-                                {[...Array(28)].map((_, i) => (
-                                    <div key={i} className="aspect-square bg-slate-700/30 rounded-lg p-2 flex flex-col items-center">
-                                        <span className="text-sm">{i + 1}</span>
-                                        <div className={`w-2 h-2 rounded-full mt-1 ${
-                                            i < 10 ? 'bg-green-500' :
-                                                i === 15 ? 'bg-yellow-500' :
-                                                    i === 22 ? 'bg-red-500' : 'bg-green-500'
-                                        }`}></div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex justify-center gap-6 mt-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-xs text-gray-400">Operacional</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                    <span className="text-xs text-gray-400">Degradado</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <span className="text-xs text-gray-400">Caído</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Estadísticas mensuales */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                                <p className="text-sm text-gray-400 mb-1">Tiempo activo</p>
-                                <p className="text-2xl font-bold text-green-400">99.99%</p>
-                                <p className="text-xs text-gray-500 mt-1">Últimos 30 días</p>
-                            </div>
-                            <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                                <p className="text-sm text-gray-400 mb-1">Incidentes</p>
-                                <p className="text-2xl font-bold">3</p>
-                                <p className="text-xs text-gray-500 mt-1">2 resueltos, 1 activo</p>
-                            </div>
-                            <div className="bg-slate-800 p-4 rounded-lg border border-slate-700">
-                                <p className="text-sm text-gray-400 mb-1">Tiempo medio de respuesta</p>
-                                <p className="text-2xl font-bold">243ms</p>
-                                <p className="text-xs text-gray-500 mt-1">API REST</p>
-                            </div>
-                        </div>
-
-                        <p className="text-center text-gray-500 text-sm mt-8">
-                            ⚡ Los datos de disponibilidad se actualizan cada 5 minutos
-                        </p>
-                    </div>
-                )}
             </div>
 
             {/* Footer */}
