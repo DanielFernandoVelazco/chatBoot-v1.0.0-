@@ -12,4 +12,5 @@ public class UserUpdateDto {
     private String bio;
     private String profilePhotoUrl;
     private Boolean notificationsEnabled;
+    private Boolean allowLastSeen; // NUEVO
 }
