@@ -20,4 +20,9 @@ public class UserResponseDto {
     private Boolean online;
     private LocalDateTime createdAt;
     private Boolean notificationsEnabled;
+
+    // NUEVOS CAMPOS
+    private Boolean allowLastSeen;
+    private LocalDateTime lastSeen; // Última vez que estuvo en línea
+    private String lastSeenText; // Texto formateado para mostrar (ej: "hace 5 minutos")
 }
