@@ -36,9 +36,13 @@ public class User {
     @Column(nullable = false)
     private Boolean notificationsEnabled = true;
 
-    // NUEVO CAMPO: Permitir ver última conexión
+    // NUEVO: Permitir ver última conexión
     @Column(name = "allow_last_seen", nullable = false)
     private Boolean allowLastSeen = true;
+
+    // NUEVO: Última vez visto
+    @Column(name = "last_seen")
+    private LocalDateTime lastSeen;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -50,6 +54,7 @@ public class User {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        lastSeen = LocalDateTime.now(); // NUEVO: Inicializar lastSeen
     }
 
     @PreUpdate
