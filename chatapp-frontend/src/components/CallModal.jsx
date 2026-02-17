@@ -21,18 +21,21 @@ const CallModal = ({
     const [callDuration, setCallDuration] = useState(0);
     const timerRef = useRef(null);
 
+    // Efecto para el video local
     useEffect(() => {
         if (localVideoRef.current && localStream) {
             localVideoRef.current.srcObject = localStream;
         }
     }, [localStream]);
 
+    // Efecto para el video remoto
     useEffect(() => {
         if (remoteVideoRef.current && remoteStream) {
             remoteVideoRef.current.srcObject = remoteStream;
         }
     }, [remoteStream]);
 
+    // Efecto para el temporizador de duración de llamada
     useEffect(() => {
         if (callStatus === 'connected') {
             // Iniciar contador de duración
@@ -53,12 +56,14 @@ const CallModal = ({
         };
     }, [callStatus]);
 
+    // Formatear duración de llamada (MM:SS)
     const formatDuration = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
+    // Silenciar/activar micrófono
     const toggleMute = () => {
         if (localStream) {
             const audioTracks = localStream.getAudioTracks();
@@ -69,6 +74,7 @@ const CallModal = ({
         }
     };
 
+    // Activar/desactivar video
     const toggleVideo = () => {
         if (localStream && callType === 'video') {
             const videoTracks = localStream.getVideoTracks();
@@ -79,7 +85,12 @@ const CallModal = ({
         }
     };
 
+    // Si el modal no está abierto, no renderizar nada
     if (!isOpen) return null;
+
+    // Determinar el nombre a mostrar (con validación)
+    const displayName = contactName || 'Contacto';
+    const displayAvatar = contactAvatar || (displayName ? displayName.charAt(0).toUpperCase() : '?');
 
     return (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
@@ -89,13 +100,13 @@ const CallModal = ({
                 <div className="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
-                            {contactAvatar || contactName?.charAt(0) || '?'}
+                            {displayAvatar}
                         </div>
                         <div>
-                            <h3 className="font-semibold text-white">{contactName}</h3>
+                            <h3 className="font-semibold text-white">{displayName}</h3>
                             <p className="text-xs text-gray-400">
                                 {callStatus === 'calling' && '📞 Llamando...'}
-                                {callStatus === 'ringing' && '🔔 Timbre...'}
+                                {callStatus === 'ringing' && (isIncoming ? '🔔 Llamada entrante...' : '🔔 Timbre...')}
                                 {callStatus === 'connected' && `⏱️ ${formatDuration(callDuration)}`}
                                 {callStatus === 'ended' && '❌ Llamada finalizada'}
                             </p>
@@ -104,6 +115,7 @@ const CallModal = ({
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-white text-2xl"
+                        aria-label="Cerrar"
                     >
                         ✕
                     </button>
@@ -123,16 +135,21 @@ const CallModal = ({
                     ) : (
                         <div className="text-center">
                             <div className="w-32 h-32 rounded-full bg-indigo-600 mx-auto mb-4 flex items-center justify-center text-4xl font-bold text-white">
-                                {contactAvatar || contactName?.charAt(0) || '?'}
+                                {displayAvatar}
                             </div>
-                            <p className="text-white text-xl">{contactName}</p>
+                            <p className="text-white text-xl">{displayName}</p>
                             <p className="text-gray-400 mt-2">
                                 {callType === 'audio' ? '🎤 Llamada de voz' : '📹 Videollamada'}
                             </p>
+                            {callStatus === 'connected' && callType === 'audio' && (
+                                <p className="text-green-400 text-sm mt-4">
+                                    Hablando...
+                                </p>
+                            )}
                         </div>
                     )}
 
-                    {/* Video local (esquina) */}
+                    {/* Video local (esquina) - solo visible en videollamada y cuando hay stream */}
                     {callType === 'video' && localStream && (
                         <div className="absolute bottom-4 right-4 w-48 h-36 bg-slate-800 rounded-lg overflow-hidden border-2 border-slate-600 shadow-lg">
                             <video
@@ -142,6 +159,11 @@ const CallModal = ({
                                 muted
                                 className="w-full h-full object-cover"
                             />
+                            {isVideoOff && (
+                                <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center">
+                                    <span className="text-gray-400">Cámara apagada</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -170,9 +192,17 @@ const CallModal = ({
                             </div>
                         </div>
                     )}
+
+                    {/* Indicador de micrófono silenciado */}
+                    {isMuted && callStatus === 'connected' && (
+                        <div className="absolute top-4 left-4 bg-red-600/80 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                            <span>🔇</span>
+                            Micrófono silenciado
+                        </div>
+                    )}
                 </div>
 
-                {/* Controles de llamada */}
+                {/* Controles de llamada (solo cuando está conectado) */}
                 {callStatus === 'connected' && (
                     <div className="bg-slate-800 p-6 flex justify-center gap-6">
                         <button
