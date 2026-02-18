@@ -130,4 +130,98 @@ git clone https://github.com/tu-usuario/chatapp.git
 cd chatapp
 
 
+2. Configurar Base de Datos
 
+CREATE DATABASE chatapp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+3. Configurar Backend
+
+cd backend
+# Editar src/main/resources/application.yaml con tus credenciales
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/chatapp_db
+    username: tu_usuario
+    password: tu_contraseña
+  
+ai:
+  provider-url: https://api.openai.com/v1
+  model-name: gpt-3.5-turbo
+  api-key: tu_api_key_openai
+  system-prompt: "Eres un asistente útil para una aplicación de chat."
+  
+  4. Ejecutar Backend
+# Con Maven
+./mvnw spring-boot:run
+
+# O desde tu IDE (IntelliJ, Eclipse, etc.)
+
+5. Configurar Frontend
+
+cd ../frontend
+npm install
+
+6. Ejecutar Frontend
+
+npm run dev
+
+7. Acceder a la aplicación
+
+Frontend: http://localhost:5173
+Backend API: http://localhost:8081
+WebSocket: ws://localhost:8081/ws-chat
+
+📚 Documentación Adicional
+Backend README - Detalles del backend
+
+Frontend README - Detalles del frontend
+
+API Documentation - Endpoints REST
+
+🎯 Funcionalidades por Implementar
+Mensajes grupales
+
+Reacciones a mensajes (👍, ❤️, etc.)
+
+Notificaciones push
+
+Modo oscuro/claro
+
+Búsqueda de mensajes
+
+Eliminación de mensajes
+
+Autenticación de dos factores (2FA)
+
+Llamadas grupales
+
+🤝 Contribuciones
+Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
+
+Fork el proyecto
+
+Crea una rama (git checkout -b feature/NuevaCaracteristica)
+
+Commit tus cambios (git commit -m 'Agrega nueva característica')
+
+Push a la rama (git push origin feature/NuevaCaracteristica)
+
+Abre un Pull Request
+
+📄 Licencia
+Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
+
+👥 Autores
+Tu Nombre - Desarrollo inicial - @DanielFernandoVelazco
+
+🙏 Agradecimientos
+OpenAI por la API de IA
+
+Simple-Peer por la biblioteca WebRTC
+
+Tailwind CSS por los estilos
+
+Spring Boot por el framework backend
+
+⭐ Si te gusta este proyecto, no olvides darle una estrella en GitHub ⭐
