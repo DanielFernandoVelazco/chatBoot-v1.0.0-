@@ -1,142 +1,133 @@
-# Primeros pasos – ChatBoot v1.0.0
+# 💬 ChatApp - Aplicación de Mensajería en Tiempo Real
 
-## Descripción general
-Este documento guía la configuración y ejecución de **ChatBoot v1.0.0** en un entorno local, incluyendo:
-- Frontend en **React + Vite**
-- Backend en **Spring Boot**
-- Base de datos **PostgreSQL**
-- Integración con un proveedor de IA compatible con OpenAI
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![React](https://img.shields.io/badge/React-18.2.0-61DAFB)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.0-brightgreen)
+![WebSocket](https://img.shields.io/badge/WebSocket-STOMP-purple)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Al finalizar, la aplicación de chat estará funcionando localmente.
+## 📋 Descripción
 
----
+**ChatApp** es una aplicación de mensajería moderna y completa que permite comunicación en tiempo real entre usuarios, con funcionalidades avanzadas como chat con IA, llamadas de voz y videollamadas, y un sistema completo de gestión de usuarios.
 
-## Arquitectura del sistema
-
-| Componente | Tecnología | Puerto | Directorio |
-|----------|-----------|--------|------------|
-| Frontend | React + Vite | 5173 | chatapp-frontend |
-| Backend | Spring Boot 4.0.2 | 8081 | chatapp-backend |
-
-Servicios externos requeridos:
-- PostgreSQL
-- API de proveedor de IA (OpenAI o compatible)
+La aplicación está construida con una arquitectura de microservicios utilizando **Spring Boot** en el backend y **React** en el frontend, comunicándose mediante WebSockets para mensajería instantánea y WebRTC para llamadas peer-to-peer.
 
 ---
 
-## Requisitos previos
+## ✨ Características Principales
 
-- JDK 17  
-- Maven  
-- Node.js 18+ y npm  
-- PostgreSQL 12+  
-- Clave API del proveedor de IA  
+### 💬 Mensajería
+- ✅ **Chat en tiempo real** con WebSocket
+- ✅ **Conversaciones 1 a 1** entre usuarios
+- ✅ **Envío de imágenes** en el chat
+- ✅ **Emojis** integrados
+- ✅ **Historial de mensajes** persistente
+
+### 🤖 Asistente IA
+- ✅ **Modo IA** para consultar al asistente
+- ✅ Respuestas automáticas inteligentes
+- ✅ Integración con API de OpenAI
+
+### 📞 Llamadas
+- ✅ **Llamadas de voz** peer-to-peer (WebRTC)
+- ✅ **Videollamadas** con calidad HD
+- ✅ **Controles** (silenciar, activar/desactivar cámara)
+- ✅ **Modal de llamada** con temporizador
+- ✅ **Señalización** vía WebSocket
+
+### 👤 Gestión de Usuarios
+- ✅ **Registro** e **inicio de sesión**
+- ✅ **Edición de perfil** (nombre, bio, foto)
+- ✅ **Cambio de contraseña** seguro
+- ✅ **Configuración de privacidad** (última vez visto)
+- ✅ **Notificaciones** configurables
+
+### 🆘 Centro de Ayuda
+- ✅ **Preguntas Frecuentes** dinámicas
+- ✅ **Contacto con soporte** (tickets)
+- ✅ **Términos y condiciones**
+- ✅ **Política de privacidad**
+- ✅ **Gestión de cuenta** (guías)
+- ✅ **Seguridad y privacidad** (consejos)
+- ✅ **Resolución de problemas** (troubleshooting)
+- ✅ **Estado del sistema** en tiempo real
 
 ---
 
-## Configuración del Backend
+## 🏗️ Arquitectura del Proyecto
 
-### 1. Base de datos
-```sql
-CREATE DATABASE chatapp;
-CREATE USER chatapp_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE chatapp TO chatapp_user;
-```
+chatapp/
+├── backend/ # Spring Boot Application
+│ ├── src/
+│ │ ├── main/
+│ │ │ ├── java/com/chatapp/chatapp_backend/
+│ │ │ │ ├── config/ # Configuraciones (Security, WebSocket)
+│ │ │ │ ├── controller/ # Controladores REST y WebSocket
+│ │ │ │ ├── dto/ # Data Transfer Objects
+│ │ │ │ ├── model/ # Entidades JPA
+│ │ │ │ ├── repository/ # Repositorios Spring Data
+│ │ │ │ └── service/ # Lógica de negocio
+│ │ │ └── resources/
+│ │ │ └── application.yaml
+│ │ └── test/
+│ └── pom.xml
+│
+└── frontend/ # React Application
+├── public/
+├── src/
+│ ├── components/ # Componentes reutilizables
+│ ├── pages/ # Páginas de la aplicación
+│ │ └── help/ # Componentes del centro de ayuda
+│ ├── App.jsx # Componente principal
+│ ├── main.jsx # Punto de entrada
+│ └── index.css # Estilos globales
+├── index.html
+├── package.json
+└── vite.config.js # Configuración de Vite
 
-### 2. Variables de entorno (.env)
-```env
-DB_URL=jdbc:postgresql://localhost:5432/chatapp
-DB_USER=chatapp_user
-DB_PASSWORD=your_password
-SERVER_PORT=8081
-AI_PROVIDER_URL=https://api.openai.com/v1
-AI_MODEL=gpt-3.5-turbo
-AI_API_KEY=sk-your-openai-api-key
-```
 
-### 3. Ejecución
+---
+
+## 🚀 Tecnologías Utilizadas
+
+### Backend
+- **Java 17** - Lenguaje principal
+- **Spring Boot 3.1** - Framework
+- **Spring Security** - Autenticación y autorización
+- **Spring Data JPA** - Persistencia
+- **WebSocket (STOMP)** - Comunicación en tiempo real
+- **MySQL** - Base de datos
+- **Lombok** - Reducción de código boilerplate
+- **BCrypt** - Encriptación de contraseñas
+
+### Frontend
+- **React 18** - Biblioteca UI
+- **Vite** - Build tool
+- **Tailwind CSS** - Estilos
+- **Axios** - Cliente HTTP
+- **STOMP.js + SockJS** - Cliente WebSocket
+- **Simple-Peer** - WebRTC para llamadas
+- **React Hooks** - Gestión de estado
+
+---
+
+## ⚙️ Requisitos Previos
+
+- **Java 17** o superior
+- **Node.js 18** o superior
+- **MySQL 8** o superior
+- **Maven 3.8** o superior
+- **npm** o **yarn**
+
+---
+
+## 🔧 Instalación y Configuración
+
+### 1. Clonar el repositorio
+
 ```bash
-cd chatapp-backend
-mvn clean install
-mvn spring-boot:run
-```
+git clone https://github.com/tu-usuario/chatapp.git
+cd chatapp
 
-Backend disponible en: http://localhost:8081
 
----
 
-## Configuración del Frontend
-
-### Instalación
-```bash
-cd chatapp-frontend
-npm install
-```
-
-### Ejecución
-```bash
-npm run dev
-```
-
-Frontend disponible en: http://localhost:5173
-
----
-
-## Verificación
-
-- Backend:
-```bash
-curl http://localhost:8081/api/auth/users
-```
-
-- Frontend:
-Abrir http://localhost:5173 en el navegador.
-
-- WebSocket:
-Conexión a `ws://localhost:8081/ws-chat`
-
----
-
-## Perfiles de entorno
-
-| Perfil | Base de datos | Uso |
-|------|---------------|-----|
-| Desarrollo | H2 en memoria | Pruebas locales |
-| Producción | PostgreSQL | Despliegue |
-
-Ejemplo H2:
-```env
-DB_URL=jdbc:h2:mem:testdb
-DB_USER=sa
-DB_PASSWORD=
-```
-
----
-
-## Seguridad
-
-- CORS: http://localhost:5173
-- CSRF: deshabilitado
-- Endpoints públicos:
-  - /api/auth/**
-  - /api/messages/**
-  - /ws-chat/**
-- Hash de contraseñas: BCrypt
-
----
-
-## Solución de problemas comunes
-
-- **Driver PostgreSQL no encontrado**: verificar DB_URL y servicio activo
-- **Errores CORS**: confirmar puerto 5173
-- **401 en IA**: validar AI_API_KEY
-
----
-
-## Próximos pasos
-
-- Arquitectura
-- Autenticación de usuarios
-- Mensajería en tiempo real
-- Referencia de la API
-- Modelos de datos
