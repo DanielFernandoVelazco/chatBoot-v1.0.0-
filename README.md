@@ -1,234 +1,219 @@
-================================================================================
-CHATAPP – FULL STACK REAL-TIME MESSAGING PLATFORM
-Autor: Daniel Fernando Velazco
-Stack Principal: Java + Spring Boot + React + WebSocket + WebRTC
-================================================================================
+# 💬 ChatApp – Full Stack Real-Time Messaging Platform
 
-RESUMEN EJECUTIVO
-================================================================================
+![Java](https://img.shields.io/badge/Java-17-red)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1-brightgreen)
+![React](https://img.shields.io/badge/React-18-blue)
+![WebSocket](https://img.shields.io/badge/WebSocket-STOMP-purple)
+![WebRTC](https://img.shields.io/badge/WebRTC-P2P-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-ChatApp es una aplicación full stack de mensajería en tiempo real diseñada
-para demostrar competencias avanzadas en:
+> Plataforma de mensajería en tiempo real construida con arquitectura moderna Full Stack.  
+> Diseñada para demostrar competencias avanzadas en backend empresarial, comunicación en tiempo real y diseño escalable.
 
-- Arquitectura backend con Spring Boot
+---
+
+## 📌 Resumen del Proyecto
+
+**ChatApp** es una aplicación de mensajería en tiempo real que integra:
+
+- Comunicación instantánea con WebSocket (STOMP)
+- Llamadas de voz y video mediante WebRTC
+- Persistencia con JPA + MySQL
 - Seguridad con Spring Security
-- Comunicación en tiempo real (WebSocket - STOMP)
-- WebRTC para llamadas peer-to-peer
-- Integración con APIs externas (OpenAI)
-- Desarrollo frontend moderno con React
-- Persistencia con JPA y MySQL
-- Diseño desacoplado y mantenible
+- Integración con API de OpenAI
+- Frontend moderno con React 18 + Vite
 
-El proyecto simula un producto real listo para evolucionar hacia entorno
-productivo.
+El proyecto simula una arquitectura lista para evolucionar a entorno productivo.
 
-================================================================================
-QUÉ PROBLEMA RESUELVE
-================================================================================
+---
 
-ChatApp implementa un sistema de comunicación en tiempo real con:
+## 🏗️ Arquitectura
 
-- Mensajería instantánea persistente
-- Integración de IA como asistente conversacional
-- Llamadas de voz y videollamadas P2P
-- Gestión completa de usuarios
-- Centro de ayuda estructurado
+### Backend (Spring Boot)
 
-Representa una arquitectura moderna de aplicaciones colaborativas.
+Arquitectura en capas bien definida:
 
-================================================================================
-ARQUITECTURA
-================================================================================
+```
+controller/  → Endpoints REST + WebSocket
+service/     → Lógica de negocio
+repository/  → Persistencia (Spring Data JPA)
+dto/         → Desacoplamiento de entidades
+config/      → Seguridad + WebSocket
+```
 
-Arquitectura en capas con separación clara de responsabilidades:
+**Principios aplicados:**
 
-Backend (Spring Boot)
---------------------------------------------------
-Controller Layer      → Endpoints REST + WebSocket
-Service Layer         → Lógica de negocio
-Repository Layer      → Persistencia JPA
-DTO Layer             → Desacoplamiento de entidades
-Config Layer          → Seguridad y WebSocket
+- Separación de responsabilidades
+- Desacoplamiento mediante DTOs
+- Configuración externa con `application.yaml`
+- Seguridad basada en Spring Security
+- Encriptación con BCrypt
 
-Frontend (React)
---------------------------------------------------
-Component-based architecture
-State management con Hooks
-Separación por páginas y componentes reutilizables
-Comunicación con backend vía REST + WebSocket
+---
 
-Comunicación en Tiempo Real
---------------------------------------------------
-- WebSocket (STOMP) para mensajería
-- WebRTC para llamadas P2P
-- Señalización mediante WebSocket
+### Frontend (React)
 
-================================================================================
-STACK TECNOLÓGICO
-================================================================================
+- Arquitectura basada en componentes
+- React Hooks para gestión de estado
+- Comunicación REST + WebSocket
+- Integración WebRTC en navegador
+- UI moderna con Tailwind CSS
 
-Backend:
-- Java 17
-- Spring Boot 3.1
-- Spring Security
-- Spring Data JPA
-- WebSocket (STOMP)
-- MySQL 8
-- BCrypt
-- Lombok
+---
 
-Frontend:
-- React 18
-- Vite
-- Tailwind CSS
-- Axios
-- STOMP.js + SockJS
-- Simple-Peer (WebRTC)
+## ⚙️ Stack Tecnológico
 
-Integraciones:
-- API OpenAI (modo IA)
+| Capa        | Tecnologías |
+|-------------|-------------|
+| Backend     | Java 17, Spring Boot 3.1, Spring Security, JPA |
+| Tiempo Real | WebSocket (STOMP), WebRTC |
+| Base de Datos | MySQL 8 |
+| Frontend    | React 18, Vite, Tailwind |
+| Integraciones | OpenAI API |
 
-================================================================================
-COMPETENCIAS DEMOSTRADAS
-================================================================================
+---
 
-Backend
---------------------------------------------------
-✔ Diseño de API REST estructurada
-✔ Seguridad basada en autenticación
-✔ Encriptación segura de contraseñas
-✔ Persistencia con JPA
-✔ Manejo de DTOs para desacoplamiento
-✔ Configuración externa con YAML
-✔ Integración con APIs externas
-✔ Manejo de concurrencia en WebSocket
+## 🚀 Funcionalidades Implementadas
 
-Tiempo Real
---------------------------------------------------
-✔ Implementación de WebSocket con STOMP
-✔ Gestión de sesiones activas
-✔ Broadcast y mensajería dirigida
-✔ Señalización WebRTC
-
-Frontend
---------------------------------------------------
-✔ Arquitectura modular basada en componentes
-✔ Manejo de estado con React Hooks
-✔ Comunicación HTTP y WebSocket
-✔ Integración WebRTC en navegador
-✔ UI moderna con Tailwind
-
-Arquitectura y Buenas Prácticas
---------------------------------------------------
-✔ Separación clara frontend/backend
-✔ Código organizado por capas
-✔ Responsabilidades bien definidas
-✔ Proyecto estructurado para escalabilidad
-✔ Configuración desacoplada del código
-
-================================================================================
-FUNCIONALIDADES IMPLEMENTADAS
-================================================================================
-
-Mensajería:
+### 💬 Mensajería
 - Chat 1 a 1 en tiempo real
-- Persistencia de mensajes
+- Persistencia de historial
 - Envío de imágenes
 - Emojis
-- Historial
+- Broadcast y mensajería dirigida
 
-IA:
-- Modo asistente
+### 🤖 Asistente IA
+- Modo IA integrado
 - Prompt configurable
-- Respuestas dinámicas
+- Respuestas dinámicas vía API externa
 
-Llamadas:
-- Voz P2P
-- Video HD
-- Controles de micrófono y cámara
-- Temporizador de llamada
+### 📞 Llamadas
+- Voz peer-to-peer
+- Videollamadas HD
+- Señalización mediante WebSocket
+- Controles de cámara y micrófono
 
-Usuarios:
-- Registro
-- Login
+### 👤 Gestión de Usuarios
+- Registro e inicio de sesión
 - Edición de perfil
-- Cambio de contraseña
+- Cambio de contraseña seguro
 - Configuración de privacidad
 
-Centro de ayuda:
-- FAQ
-- Soporte
-- Políticas
-- Estado del sistema
+---
 
-================================================================================
-ESCALABILIDAD Y EVOLUCIÓN
-================================================================================
+## 🧠 Competencias Técnicas Demostradas
+
+### Backend
+- Diseño de API REST estructurada
+- Seguridad y autenticación
+- Persistencia relacional
+- Manejo de concurrencia WebSocket
+- Integración con servicios externos
+- Arquitectura mantenible y escalable
+
+### Tiempo Real
+- Implementación de STOMP
+- Gestión de sesiones activas
+- Señalización WebRTC
+
+### Frontend
+- Componentización limpia
+- Manejo de estado eficiente
+- Integración de protocolos en tiempo real
+
+---
+
+## 📈 Escalabilidad y Evolución
 
 El diseño permite evolucionar hacia:
 
-- Microservicios independientes
 - Autenticación JWT
+- Microservicios independientes
 - Redis para sesiones
-- Mensajería con Kafka
-- Despliegue con Docker
+- Kafka para eventos
+- Docker + Docker Compose
 - CI/CD
-- Orquestación con Kubernetes
-- Base de datos PostgreSQL
-- Almacenamiento en S3
+- Kubernetes
+- PostgreSQL
+- Almacenamiento en la nube (S3)
 
-================================================================================
-PRÓXIMAS MEJORAS PLANIFICADAS
-================================================================================
+---
 
-- Chats grupales
-- Reacciones a mensajes
-- Notificaciones push
-- Autenticación 2FA
-- Llamadas grupales
-- Dockerización completa
-- Tests unitarios y de integración
-- Documentación OpenAPI
+## 🛠️ Instalación
 
-================================================================================
-CÓMO EJECUTAR
-================================================================================
+### Requisitos
 
-Requisitos:
 - Java 17+
 - Node 18+
 - MySQL 8+
-- Maven
+- Maven 3.8+
 
-Backend:
+### Clonar repositorio
+
+```bash
+git clone https://github.com/tu-usuario/chatapp.git
+cd chatapp
+```
+
+### Configurar base de datos
+
+```sql
+CREATE DATABASE chatapp_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+### Ejecutar Backend
+
+```bash
+cd backend
 ./mvnw spring-boot:run
+```
 
-Frontend:
+### Ejecutar Frontend
+
+```bash
+cd frontend
 npm install
 npm run dev
+```
 
-================================================================================
-IMPACTO TÉCNICO
-================================================================================
+---
+
+## 🎯 Impacto Profesional
 
 Este proyecto demuestra:
 
 - Capacidad para construir sistemas en tiempo real
 - Dominio de backend empresarial con Spring
-- Integración frontend-backend desacoplada
-- Conocimiento de protocolos (HTTP, WebSocket, WebRTC)
-- Buenas prácticas de seguridad
+- Integración full stack desacoplada
+- Conocimiento profundo de protocolos (HTTP, WebSocket, WebRTC)
+- Aplicación de buenas prácticas de arquitectura
 - Diseño preparado para escalar
 
-================================================================================
-CONTACTO
-================================================================================
+---
 
-Daniel Fernando Velazco
-Desarrollador Backend / Full Stack
+## 📌 Próximas Mejoras
 
-GitHub: https://github.com/tu-usuario
-LinkedIn: https://linkedin.com/in/tu-perfil
+- Chats grupales
+- Reacciones a mensajes
+- Notificaciones push
+- Autenticación 2FA
+- Dockerización completa
+- Tests unitarios y de integración
+- Documentación OpenAPI
 
-================================================================================
+---
+
+## 👨‍💻 Autor
+
+**Daniel Fernando Velazco**  
+Backend / Full Stack Developer  
+
+GitHub: https://github.com/tu-usuario  
+LinkedIn: https://linkedin.com/in/tu-perfil  
+
+---
+
+⭐ Si te interesa la arquitectura o deseas discutir mejoras técnicas, estaré encantado de conversar.
 
