@@ -14,7 +14,7 @@
 
 ## 📌 Resumen del Proyecto
 
-**ChatApp** es una aplicación de mensajería en tiempo real que integra:
+**ChatBoot-v1.0.0-** es una aplicación de mensajería en tiempo real que integra:
 
 - Comunicación instantánea con WebSocket (STOMP)
 - Llamadas de voz y video mediante WebRTC
@@ -210,8 +210,8 @@ Este proyecto demuestra:
 **Daniel Fernando Velazco**  
 Backend / Full Stack Developer  
 
-GitHub: https://github.com/tu-usuario  
-LinkedIn: https://linkedin.com/in/tu-perfil  
+GitHub: https://github.com/DanielFernandoVelazco  
+LinkedIn: https://www.linkedin.com/in/daniel-fernando-velazco-caceres/  
 
 ---
 
