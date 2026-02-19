@@ -151,8 +151,8 @@ El diseño permite evolucionar hacia:
 ### Clonar repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/chatapp.git
-cd chatapp
+git clone https://github.com/DanielFernandoVelazco/chatBoot-v1.0.0-.git
+cd chatBoot-v1.0.0-
 ```
 
 ### Configurar base de datos
