@@ -7,6 +7,8 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+---
+
 ## 📋 Descripción
 
 Backend de ChatApp, una API REST robusta y escalable construida con **Spring Boot**. Proporciona servicios de autenticación, mensajería en tiempo real vía WebSocket, integración con IA, gestión de usuarios y sistema de soporte con tickets.
@@ -53,96 +55,68 @@ Backend de ChatApp, una API REST robusta y escalable construida con **Spring Boo
 
 ## 📁 Estructura del Proyecto
 
+```bash
 backend/
 ├── src/
-│ ├── main/
-│ │ ├── java/com/chatapp/chatapp_backend/
-│ │ │ ├── config/ # Configuraciones
-│ │ │ │ ├── SecurityConfig.java # Seguridad y CORS
-│ │ │ │ ├── WebSocketConfig.java # STOMP WebSocket
-│ │ │ │ └── AppConfig.java # Beans adicionales
-│ │ │ │
-│ │ │ ├── controller/ # Controladores REST/WebSocket
-│ │ │ │ ├── AuthController.java # /api/auth/*
-│ │ │ │ ├── MessageController.java # /api/messages/*
-│ │ │ │ ├── AIController.java # /api/ai/*
-│ │ │ │ ├── SupportController.java # /api/support/*
-│ │ │ │ └── CallController.java # /app/call/* (WebSocket)
-│ │ │ │
-│ │ │ ├── dto/ # Data Transfer Objects
-│ │ │ │ ├── UserRegistrationDto.java
-│ │ │ │ ├── UserResponseDto.java
-│ │ │ │ ├── UserUpdateDto.java
-│ │ │ │ ├── MessageRequestDto.java
-│ │ │ │ ├── MessageResponseDto.java
-│ │ │ │ ├── ContactRequestDto.java
-│ │ │ │ ├── ContactResponseDto.java
-│ │ │ │ ├── FaqItemDto.java
-│ │ │ │ └── TermsContentDto.java
-│ │ │ │
-│ │ │ ├── model/ # Entidades JPA
-│ │ │ │ ├── User.java
-│ │ │ │ ├── Message.java
-│ │ │ │ └── SupportTicket.java
-│ │ │ │
-│ │ │ ├── repository/ # Repositorios Spring Data
-│ │ │ │ ├── UserRepository.java
-│ │ │ │ ├── MessageRepository.java
-│ │ │ │ └── SupportTicketRepository.java
-│ │ │ │
-│ │ │ └── service/ # Lógica de negocio
-│ │ │ ├── UserService.java
-│ │ │ ├── UserServiceImpl.java
-│ │ │ ├── MessageService.java
-│ │ │ ├── MessageServiceImpl.java
-│ │ │ ├── AIService.java
-│ │ │ └── SupportService.java
-│ │ │
-│ │ └── resources/
-│ │ ├── application.yaml # Configuración principal
-│ │ └── static/ # Archivos estáticos (opcional)
-│ │
-│ └── test/ # Pruebas unitarias
-│
-├── pom.xml # Dependencias Maven
-└── README.md # Este archivo
-
+│   ├── main/
+│   │   ├── java/com/chatapp/chatapp_backend/
+│   │   │   ├── config/
+│   │   │   │   ├── SecurityConfig.java
+│   │   │   │   ├── WebSocketConfig.java
+│   │   │   │   └── AppConfig.java
+│   │   │   ├── controller/
+│   │   │   │   ├── AuthController.java
+│   │   │   │   ├── MessageController.java
+│   │   │   │   ├── AIController.java
+│   │   │   │   ├── SupportController.java
+│   │   │   │   └── CallController.java
+│   │   │   ├── dto/
+│   │   │   ├── model/
+│   │   │   ├── repository/
+│   │   │   └── service/
+│   │   └── resources/
+│   │       ├── application.yaml
+│   │       └── static/
+│   └── test/
+├── pom.xml
+└── README.md
+```
 
 ---
 
 ## 🚀 Tecnologías Utilizadas
 
-### Core
-- **Java 17** - Lenguaje principal
-- **Spring Boot 3.1** - Framework
-- **Spring MVC** - API REST
-- **Spring Data JPA** - Persistencia
-- **Hibernate** - ORM
+### 🖥️ Core
+- **Java 17**
+- **Spring Boot 3.1**
+- **Spring MVC**
+- **Spring Data JPA**
+- **Hibernate**
 
-### Seguridad
-- **Spring Security** - Autenticación
-- **BCrypt** - Encriptación de contraseñas
-- **CORS** - Configuración de accesos
+### 🔒 Seguridad
+- **Spring Security**
+- **BCrypt**
+- **CORS**
 
-### Comunicación
-- **WebSocket (STOMP)** - Tiempo real
-- **SockJS** - Fallback para WebSocket
-- **RestTemplate** - Cliente HTTP (para IA)
+### 🔌 Comunicación
+- **WebSocket (STOMP)**
+- **SockJS**
+- **RestTemplate**
 
-### Base de Datos
-- **MySQL 8** - Base de datos principal
-- **H2** (opcional) - Para pruebas
+### 🗄️ Base de Datos
+- **MySQL 8**
+- **H2** (opcional para pruebas)
 
-### Utilidades
-- **Lombok** - Reducción de código
-- **Jakarta Validation** - Validación de DTOs
-- **Jackson** - Serialización JSON
+### 🧰 Utilidades
+- **Lombok**
+- **Jakarta Validation**
+- **Jackson**
 
 ---
 
 ## ⚙️ Configuración
 
-### 1. `application.yaml`
+### 1️⃣ application.yaml
 
 ```yaml
 server:
@@ -168,186 +142,141 @@ ai:
   provider-url: https://api.openai.com/v1
   model-name: gpt-3.5-turbo
   api-key: sk-tu-api-key-aqui
-  system-prompt: "Eres un asistente útil para una aplicación de chat. Responde de manera amigable y concisa."
+  system-prompt: "Eres un asistente útil para una aplicación de chat."
 
 logging:
   level:
     org.springframework.web: INFO
     com.chatapp: DEBUG
     org.hibernate.SQL: DEBUG
+```
 
-2. Configuración de Base de Datos
+---
+
+### 2️⃣ Base de Datos
+
+```sql
 CREATE DATABASE chatapp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-3. Ejecutar la aplicación
-# Con Maven
+---
+
+### 3️⃣ Ejecutar Aplicación
+
+```bash
 ./mvnw spring-boot:run
+```
 
-# Con Maven (Windows)
-mvnw.cmd spring-boot:run
+Empaquetar:
 
-# Empaquetar JAR
+```bash
 ./mvnw clean package
 java -jar target/chatapp-backend-0.0.1-SNAPSHOT.jar
+```
 
-📡 API Endpoints
-🔐 Autenticación (/api/auth)
-Método	Endpoint	Descripción	Cuerpo (JSON)
-POST	/register	Registrar usuario	{username, email, password}
-POST	/login	Iniciar sesión	{email, password}
-GET	/users	Listar todos los usuarios	-
-PUT	/users/{id}	Actualizar perfil	{username, bio, profilePhotoUrl, notificationsEnabled, allowLastSeen}
-POST	/users/{id}/change-password	Cambiar contraseña	{oldPassword, newPassword}
-💬 Mensajes (/api/messages)
-Método	Endpoint	Descripción	Cuerpo/Parámetros
-POST	/send	Enviar mensaje	{senderId, receiverId, content}
-GET	/conversation	Obtener conversación	userId1, userId2 (query params)
-🤖 IA (/api/ai)
-Método	Endpoint	Descripción	Cuerpo
-POST	/chat	Consultar IA	{message}
-🆘 Soporte (/api/support)
-Método	Endpoint	Descripción	Cuerpo
-POST	/contact	Crear ticket de soporte	{name, email, subject, message, userId?}
-GET	/faq	Obtener preguntas frecuentes	-
-GET	/terms	Obtener términos y condiciones	-
-GET	/privacy	Obtener política de privacidad	-
+---
 
-🔌 WebSocket Endpoints
-Conexión
-/ws-chat
+## 📡 API Endpoints
 
-Canales de Suscripción
-Canal	Descripción
-/topic/messages	Mensajes en tiempo real
-/user/{userId}/queue/calls	Señalización de llamadas (privado)
-Destinos de Envío
-Destino	Descripción
-/app/call.offer	Enviar oferta de llamada
-/app/call.answer	Responder a oferta
-/app/call.ice-candidate	Enviar candidato ICE
-/app/call.end	Finalizar llamada
-/app/call.reject	Rechazar llamada
-🗄️ Modelo de Datos
-User
+### 🔐 Autenticación (/api/auth)
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id @GeneratedValue private Long id;
-    @Column(unique = true) private String username;
-    @Column(unique = true) private String email;
-    private String password;
-    private String profilePhotoUrl;
-    private String bio;
-    private Boolean online;
-    private Boolean notificationsEnabled;
-    private Boolean allowLastSeen;
-    private LocalDateTime lastSeen;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-}
+| Método | Endpoint | Descripción |
+|--------|----------|------------|
+| POST | /register | Registrar usuario |
+| POST | /login | Iniciar sesión |
+| GET | /users | Listar usuarios |
+| PUT | /users/{id} | Actualizar perfil |
+| POST | /users/{id}/change-password | Cambiar contraseña |
 
-Message
+### 💬 Mensajes (/api/messages)
 
-@Entity
-@Table(name = "messages")
-public class Message {
-    @Id @GeneratedValue private Long id;
-    @ManyToOne @JoinColumn(name = "sender_id") private User sender;
-    @ManyToOne @JoinColumn(name = "receiver_id") private User receiver;
-    @Column(columnDefinition = "TEXT") private String content;
-    private LocalDateTime timestamp;
-    private Boolean isRead;
-}
+| Método | Endpoint | Descripción |
+|--------|----------|------------|
+| POST | /send | Enviar mensaje |
+| GET | /conversation | Obtener conversación |
 
-SupportTicket
+### 🤖 IA (/api/ai)
 
-@Entity
-@Table(name = "support_tickets")
-public class SupportTicket {
-    @Id @GeneratedValue private Long id;
-    @ManyToOne private User user;
-    private String name;
-    private String email;
-    private String subject;
-    @Column(columnDefinition = "TEXT") private String message;
-    @Enumerated(EnumType.STRING) private TicketStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-}
+| Método | Endpoint |
+|--------|----------|
+| POST | /chat |
 
-🔒 Seguridad
-✅ CSRF deshabilitado (API REST)
+### 🆘 Soporte (/api/support)
 
-✅ CORS configurado para frontend (localhost:5173)
+| Método | Endpoint |
+|--------|----------|
+| POST | /contact |
+| GET | /faq |
+| GET | /terms |
+| GET | /privacy |
 
-✅ Contraseñas encriptadas con BCrypt
+---
 
-✅ Endpoints públicos para autenticación y soporte
+## 🔌 WebSocket
 
-✅ Validación de DTOs con Jakarta Validation
+Conexión:
 
-SecurityConfig.java
+```
+ws://localhost:8081/ws-chat
+```
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/messages/**").permitAll()
-            .requestMatchers("/api/support/**").permitAll()
-            .requestMatchers("/ws-chat/**").permitAll()
-            .anyRequest().authenticated()
-        );
-    return http.build();
-}
+Canales:
 
-📈 Mejoras Futuras
-JWT para autenticación stateless
+- `/topic/messages`
+- `/user/{userId}/queue/calls`
 
-WebSocket seguro (WSS)
+Destinos:
 
-Cache con Redis
+- `/app/call.offer`
+- `/app/call.answer`
+- `/app/call.ice-candidate`
+- `/app/call.end`
+- `/app/call.reject`
 
-Notificaciones push
+---
 
-Mensajes grupales
+## 🔒 Seguridad
 
-Archivos adjuntos (imágenes/videos)
+- ✅ CSRF deshabilitado (API REST)
+- ✅ CORS configurado
+- ✅ BCrypt para contraseñas
+- ✅ Validación con Jakarta Validation
 
-Eliminación de mensajes
+---
 
-Reacciones a mensajes
+## 📈 Mejoras Futuras
 
-🤝 Contribuciones
-Fork el proyecto
+- JWT stateless
+- WebSocket seguro (WSS)
+- Redis cache
+- Notificaciones push
+- Mensajes grupales
+- Reacciones
+- Archivos adjuntos
 
-Crea tu rama (git checkout -b feature/AmazingFeature)
+---
 
-Commit tus cambios (git commit -m 'Add some AmazingFeature')
+## 🤝 Contribuciones
 
-Push a la rama (git push origin feature/AmazingFeature)
+1. Fork
+2. `git checkout -b feature/AmazingFeature`
+3. `git commit -m "Add AmazingFeature"`
+4. `git push origin feature/AmazingFeature`
+5. Pull Request
 
-Abre un Pull Request
+---
 
-📄 Licencia
-MIT © [Tu Nombre]
+## 📄 Licencia
 
-👥 Autores
-Tu Nombre - Desarrollo backend - @tu-usuario
+MIT © Tu Nombre
 
-📊 Métricas del Backend
-Controladores: 5
+---
 
-Servicios: 6
+## 👥 Autores
 
-Entidades: 3
+Tu Nombre – Backend Developer – @tu-usuario
 
-Endpoints REST: 15+
+---
 
-Cobertura de pruebas: ~75%
+⭐ Si este backend te es útil, dale una estrella en GitHub ⭐
 
-⭐ ¡Gracias por visitar!
-Si este backend te es útil, no olvides darle una estrella en GitHub ⭐
