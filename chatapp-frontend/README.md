@@ -78,16 +78,6 @@ chatapp/
 
 ## 🚀 Tecnologías Utilizadas
 
-### 🖥️ Backend
-- **Java 17**
-- **Spring Boot 3.1**
-- **Spring Security**
-- **Spring Data JPA**
-- **WebSocket (STOMP)**
-- **MySQL**
-- **Lombok**
-- **BCrypt**
-
 ### 🎨 Frontend
 - **React 18**
 - **Vite**
