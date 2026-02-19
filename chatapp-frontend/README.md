@@ -114,8 +114,8 @@ chatapp/
 ### 1️⃣ Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/chatapp.git
-cd chatapp
+git clone https://github.com/DanielFernandoVelazco/chatBoot-v1.0.0-.git
+cd chatBoot-v1.0.0-
 ```
 
 ### 2️⃣ Configurar Base de Datos
@@ -211,10 +211,10 @@ Consulta el archivo `LICENSE` para más detalles.
 
 ---
 
-## 👥 Autores
-
-**Tu Nombre**  
-Desarrollo inicial – @tu-usuario  
+## 👥 Autor
+**Daniel Fernando Velazco**  
+Backend / Full Stack Developer  
+GitHub: https://github.com/DanielFernandoVelazco  
 
 ---
 
