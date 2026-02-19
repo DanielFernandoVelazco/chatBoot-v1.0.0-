@@ -60,21 +60,6 @@ La aplicación está construida con una arquitectura de microservicios utilizand
 
 ```bash
 chatapp/
-├── backend/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/chatapp/chatapp_backend/
-│   │   │   │   ├── config/
-│   │   │   │   ├── controller/
-│   │   │   │   ├── dto/
-│   │   │   │   ├── model/
-│   │   │   │   ├── repository/
-│   │   │   │   └── service/
-│   │   │   └── resources/
-│   │   │       └── application.yaml
-│   │   └── test/
-│   └── pom.xml
-│
 └── frontend/
     ├── public/
     ├── src/
