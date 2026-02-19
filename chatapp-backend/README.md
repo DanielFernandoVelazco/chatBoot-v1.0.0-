@@ -268,13 +268,17 @@ Destinos:
 
 ## 📄 Licencia
 
-MIT © Tu Nombre
+Este proyecto está bajo la Licencia MIT.
+Consulta el archivo LICENSE para más detalles.
+
 
 ---
 
 ## 👥 Autores
 
-Tu Nombre – Backend Developer – @tu-usuario
+Daniel Fernando Velazco
+Backend / Full Stack Developer
+GitHub: https://github.com/DanielFernandoVelazco
 
 ---
 
